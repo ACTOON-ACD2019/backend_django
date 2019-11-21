@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="b846020f-7784-4c9f-8483-ae86cee0a474" name="beta.actoon.sokdak.me" url="http://beta.actoon.sokdak.me">
+        <fileTransfer host="beta.actoon.sokdak.me" port="22" rootFolder="/home/actoon/" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

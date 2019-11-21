@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}"/>
+<script>
+$(document).ready(function() {
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            let cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim();
+
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+    $('#form_signin').on('submit', function(e) {
+        e.preventDefault();
+        let _logparams = $('#form_signin').serialize();
+
+       $.ajax({
+           url: '/api/auth/',
+           type: 'post',
+           data: _logparams,
+
+           beforeSend: function(request) {
+               request.setRequestHeader('X-CSRFTOKEN', getCookie('csrftoken'))
+           },
+
+           success: function(response) {
+               if (response['status'] === 1) {
+                   alert(response['message']);
+               }
+               else {
+                   $('#msg_login').text(response['message'])
+                       .addClass('alert-danger')
+                       .show();
+
+                   $('#inputPassword').val('');
+               }
+           }
+       });
+    });
+});
+</script>
+{% endblock %}
+{% block app %}
+    <div class="container">
+        <div id="msg_login" class="alert" role="alert" style="display: none">
+        </div>
+        <form id="form_signin" class="form-signin" action="#" method="#">
+            {% csrf_token %}
+{#            <img class="mb-4" src="/docs/4.3/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">#}
+            <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+            <label for="inputEmail" class="sr-only">Email address</label>
+            <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
+            <label for="inputPassword" class="sr-only">Password</label>
+            <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required="">
+            <div class="checkbox mb-3">
+                <label>
+                    <input type="checkbox" value="remember-me"> Remember me
+                </label>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            <p class="mt-5 mb-3 text-muted">© 2017-2019 ACTOON</p>
+        </form>
+    </div>
+{% endblock %}

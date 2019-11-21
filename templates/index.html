@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block html_option %}
+class="h-100"
+{% endblock %}
+
+{% block style %}
+<link href="{% static 'css/index.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body_option %}
+class="d-flex flex-column h-100"
+{% endblock %}
+
+{% block header %}
+<header>
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="#">{{ app_title }}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="#">홈<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">에디터</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+        </li>
+      </ul>
+      <form class="form-inline mt-2 mt-md-0">
+          {% if user_name is not None %}
+            <a href="/login/" type="button" class="btn btn-light">로그인</a>
+          {% else %}
+              <span>{{ user_name }}</span>
+          {% endif %}
+      </form>
+    </div>
+  </nav>
+</header>
+{% endblock %}
+
+{% block app %}
+<main role="main" class="flex-shrink-0">
+  <div class="container">
+    <h1 class="mt-5">actoon main page</h1>
+  </div>
+</main>
+{% endblock %}
+
+{% block footer %}
+<footer class="footer mt-auto py-3">
+  <div class="container">
+    <span class="text-muted">2019© Software Capstone Design [Team #13 - ACTOON]</span>
+  </div>
+</footer>
+{% endblock %}

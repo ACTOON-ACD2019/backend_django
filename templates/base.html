@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE HTML>
+<html {% block html_option %}{% endblock %}>
+<head>
+  <meta charset="utf-8">
+  <title>{{ app_title }}</title>
+  <link rel="stylesheet" href="{% static 'css/bs/bootstrap.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+  <script src="{% static 'js/bs/jquery.min.js' %}"></script>
+  <script src="{% static 'js/bs/bootstrap.bundle.min.js' %}"></script>
+  {% block style %}{% endblock %}
+</head>
+<body {% block body_option %}{% endblock %}>
+  {% block header %}{% endblock %}
+  {% block app %}{% endblock %}
+  {% block footer %}{% endblock %}
+</body>
+
+</html>
