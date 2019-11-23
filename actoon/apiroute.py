@@ -33,5 +33,5 @@ urlpatterns = format_suffix_patterns([
     path('auth/', obtain_auth_token, name='auth'),
 
     path('project/', project_list, name='project_list'),
-    path('project/<int:pk>/', project_view, name='project_desc'),
+    path('project/<str:pk>/', project_view, name='project_desc'),
 ])

@@ -9,6 +9,7 @@ from rest_framework.authtoken.models import Token
 # Project
 class Project(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
 
 
