@@ -49,8 +49,21 @@ class Media(models.Model):
 
 # managing each cut
 class Cut(models.Model):
+    TYPE_SCENE = 'SC'
+    TYPE_BUBBLE = 'BU'
+    TYPE_TEXT = 'TX'
+    TYPE_UNDEFINED = 'UD'
+
+    TYPE_PROCEEDED = [
+        (TYPE_SCENE, 'Scene'),
+        (TYPE_BUBBLE, 'Bubble'),
+        (TYPE_TEXT, 'Text'),
+        (TYPE_UNDEFINED, 'Undefined')
+    ]
+
     media = models.ForeignKey(Media, on_delete=models.CASCADE)
     file = models.FileField(blank=False, null=False)
+    type = models.CharField(max_length=2, choices=TYPE_PROCEEDED, default=TYPE_UNDEFINED)
     sequence = models.IntegerField()
 
 
