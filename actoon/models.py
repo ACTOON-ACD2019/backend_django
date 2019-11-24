@@ -50,6 +50,7 @@ class Media(models.Model):
 # managing each cut
 class Cut(models.Model):
     media = models.ForeignKey(Media, on_delete=models.CASCADE)
+    file = models.FileField(blank=False, null=False)
     sequence = models.IntegerField()
 
 
