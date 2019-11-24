@@ -1,15 +1,17 @@
 import asyncio
 
 from django.contrib.auth import get_user_model
+from django.core.files import File
 from rest_framework import status
 from rest_framework import viewsets, permissions
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
-from actoon.models import Project, Task, Effect, Media
+from actoon.models import Project, Task, Effect, Media, Cut
 from actoon.serializer import ProjectSerializer, TaskSerializer, EffectSerializer, TaskListSerializer, MediaSerializer, \
     UserSerializer
 from django.shortcuts import get_list_or_404, get_object_or_404
 from actoon.apps import request as RpcRequest
+import os
 
 
 class ProjectView(viewsets.ModelViewSet):
@@ -211,8 +213,34 @@ class MediaView(viewsets.ModelViewSet):
 
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
-                loop.run_until_complete(RpcRequest(loop, 'cut_slicing', media.file))
+                loop.run_until_complete(RpcRequest(loop, 'cut_slicing', media))
                 loop.close()
+
+                # save files into database
+                for root, dirs, files in os.walk('./media/temp/'):
+                    for file in files:
+                        fit = True
+
+                        obj = Cut(
+                            media=media,
+                            file=File(open(os.path.join(root, file), 'rb'))
+                        )
+
+                        if root.__contains__('bubble'):
+                            obj.type = 'BU'
+                        elif root.__contains__('cut'):
+                            obj.type = 'SC'
+                        elif root.__contains__('text'):
+                            obj.type = 'TX'
+                        else:
+                            fit = False
+                            obj.type = 'UD'
+
+                        if fit:
+                            obj.sequence = int(file.split('.')[-2].split('_')[-1])
+                            obj.save()
+
+                # return object
 
                 return Response(status=status.HTTP_201_CREATED)
 

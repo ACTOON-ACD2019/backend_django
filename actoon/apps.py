@@ -8,6 +8,8 @@ import asyncio
 import zipfile
 import os
 
+# from actoon.models import Cut
+
 
 class ActoonConfig(AppConfig):
     name = 'actoon'
@@ -57,31 +59,18 @@ class RpcClient:
         return await future
 
 
-async def request(loop, task, filename=None):
+async def request(loop, task, media=None):
     deeplearning_client = await RpcClient(loop).connect()
-    print(" [x] Requesting cut slicing %s" % filename)
+    print(" [x] Requesting cut slicing %s" % media.file)
 
     if task is 'cut_slicing':
         # make a rpc call
-        response = await deeplearning_client.call_cut_slicing(filename)
-        open('/tmp/result_received.zip', 'wb').write(base64.b64decode(response))
+        response = await deeplearning_client.call_cut_slicing(media.file)
+        open('./media/temp/result_received.zip', 'wb').write(base64.b64decode(response))
 
         # uncompressing zip
-        with zipfile.ZipFile('/tmp/result_received.zip', 'r') as zip_ref:
-            zip_ref.extractall('/tmp/actoon')
-
-        # save files into database
-        for root, dirs, files in os.walk('/tmp/actoon/'):
-            if root.__contains__('bubble'):
-                for file in files:
-                    value = open(os.path.join(root, file), 'rb')
-                    pass
-            elif root.__contains__('cut'):
-                pass
-            elif root.__contains__('text'):
-                pass
-
-        # return object
+        with zipfile.ZipFile('./media/temp/result_received.zip', 'r') as zip_ref:
+            zip_ref.extractall('./media/temp/')
     else:
         # preprocessing histories
 
