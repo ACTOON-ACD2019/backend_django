@@ -9,32 +9,22 @@ from rest_framework.authtoken.models import Token
 # Project
 class Project(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)  # name should be unique value per each users
     description = models.CharField(max_length=255)
 
 
-# managing action
-class Action(models.Model):
-    ACTION_TYPE_MOVE = 'MOVE'
-    ACTION_TYPE_SWING = 'SWIG'
-    ACTION_TYPE_APPEAR = 'APER'
-    ACTION_TYPE_UNDEFINED = 'UDEF'
-
-    TYPE_ACTION = [
-        (ACTION_TYPE_MOVE, 'Move'),
-        (ACTION_TYPE_SWING, 'Swing'),
-        (ACTION_TYPE_APPEAR, 'Appear'),
-        (ACTION_TYPE_UNDEFINED, 'Undefined')
-    ]
-
-    type = models.CharField(max_length=4, choices=TYPE_ACTION, default=ACTION_TYPE_UNDEFINED)
-    parameters = models.CharField(max_length=255)
+# managing available effects
+class Effect(models.Model):
+    name = models.CharField(max_length=50)
+    required_parameters = models.CharField(max_length=255)
 
 
 # History (Task)
+# merging Action and Task model to simplify model
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    action = models.ForeignKey(Action, on_delete=models.CASCADE)
+    effect = models.ForeignKey(Effect, on_delete=models.CASCADE)
+    parameters = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
@@ -53,8 +43,8 @@ class Media(models.Model):
     ]
 
     media_type = models.CharField(max_length=2, choices=TYPE_MEDIA, default=TYPE_UNDEFINED)
-    project_id = models.ForeignKey(Project, on_delete=models.CASCADE)
-    location = models.CharField(max_length=255)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    file = models.FileField(blank=False, null=False)
 
 
 # managing each cut
