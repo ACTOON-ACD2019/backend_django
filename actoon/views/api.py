@@ -1,3 +1,5 @@
+import asyncio
+
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework import viewsets, permissions
@@ -7,11 +9,12 @@ from actoon.models import Project, Task, Effect, Media
 from actoon.serializer import ProjectSerializer, TaskSerializer, EffectSerializer, TaskListSerializer, MediaSerializer, \
     UserSerializer
 from django.shortcuts import get_list_or_404, get_object_or_404
+from actoon.apps import request as RpcRequest
 
 
 class ProjectView(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         user = self.request.user
@@ -58,15 +61,15 @@ class ProjectView(viewsets.ModelViewSet):
 
 class TaskView(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self, project_name=None, task_index=None):
         if project_name is not None:
             project_instance = self.get_project(project_name)
 
             if task_index is not None:
-                queryset_task_object = Task.objects.filter(project=project_instance)\
-                                                   .order_by('created_at')
+                queryset_task_object = Task.objects.filter(project=project_instance) \
+                    .order_by('created_at')
 
                 if len(queryset_task_object) > task_index:
                     return queryset_task_object[task_index - 1]
@@ -101,6 +104,7 @@ class TaskView(viewsets.ModelViewSet):
         if queryset is not None:
             instance = get_list_or_404(queryset)  # 404 if there are no tasks in project
             serializer = TaskListSerializer(instance, many=True)
+            # serializer.validated_data.pop('project')  # remove project_id from task results
             return Response(serializer.data)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)  # no such project
@@ -134,7 +138,15 @@ class TaskView(viewsets.ModelViewSet):
 
 class EffectView(viewsets.ModelViewSet):
     queryset = Effect.objects.all()
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self, pk=None):
+        if pk is not None:
+            queryset = Effect.objects.all(pk=pk)
+        else:
+            queryset = Effect.objects.all()
+
+        return queryset
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -142,10 +154,16 @@ class EffectView(viewsets.ModelViewSet):
         serializer = EffectSerializer(instance, many=True)
         return Response(serializer.data)
 
+    def retrieve(self, request, pk=None):
+        queryset = self.get_queryset()
+        instance = get_object_or_404(queryset)
+        serializer = EffectSerializer(instance)
+        return Response(serializer.data)
+
 
 class MediaView(viewsets.ModelViewSet):
     serializer_class = MediaSerializer
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self, project_name=None, media_id=None):
         if project_name is not None:
@@ -189,7 +207,13 @@ class MediaView(viewsets.ModelViewSet):
             project = self.get_project(project_name=pk)
 
             if project is not None:
-                self.perform_create(serializer, project=project)
+                media = self.perform_create(serializer, project=project)
+
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                loop.run_until_complete(RpcRequest(loop, 'cut_slicing', media.file))
+                loop.close()
+
                 return Response(status=status.HTTP_201_CREATED)
 
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -203,10 +227,10 @@ class MediaView(viewsets.ModelViewSet):
         obj.file = self.request.FILES.get('file')
 
     def perform_create(self, serializer, project=None):
-        serializer.save(project=project)
+        return serializer.save(project=project)
 
 
 class RegisterView(viewsets.ModelViewSet):
     model = get_user_model()
-    permission_classes = (permissions.AllowAny, )
+    permission_classes = (permissions.AllowAny,)
     serializer_class = UserSerializer

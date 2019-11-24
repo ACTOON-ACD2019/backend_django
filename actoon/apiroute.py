@@ -43,6 +43,10 @@ effect_list = api.EffectView.as_view({
     'get': 'list'           # get available effects
 })
 
+effect_view = api.EffectView.as_view({
+    'get': 'retrieve'
+})
+
 media_list = api.MediaView.as_view({
     'get': 'list',
     'put': 'create'
@@ -68,6 +72,7 @@ urlpatterns = format_suffix_patterns([
     path('task/<str:pk>/<int:tpk>/', task_view, name='task_desc'),
 
     path('effect/', effect_list, name='effect_list'),
+    path('effect/<int:pk>/', effect_view, name='effect_desc'),
 
     path('media/<str:pk>/', media_list, name='media_list'),
     path('media/<str:pk>/<int:mpk>/', media_view, name='media_view')
