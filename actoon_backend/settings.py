@@ -25,7 +25,11 @@ SECRET_KEY = '$u4i#(-uq3v)blij^t5^*9j@gpiyzso*+42a*e9-4lvf&z7zq6'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['beta.actoon.sokdak.me', 'localhost']
+ALLOWED_HOSTS = [
+    'actoon.sokdak.me',
+    'beta.actoon.sokdak.me',
+    'localhost'
+]
 
 
 # Application definition
@@ -132,3 +136,16 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 APP_NAME = 'ACTOON'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+if DEBUG is True:
+    INSTALLED_APPS += ('corsheaders',)
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = [
+    'https://beta.actoon.sokdak.me',
+    'http://localhost:8080',
+    'http://localhost:8000'
+]

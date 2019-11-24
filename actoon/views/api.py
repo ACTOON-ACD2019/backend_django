@@ -1,8 +1,11 @@
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework import viewsets, permissions
+from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
-from actoon.models import Project, Task, Effect
-from actoon.serializer import ProjectSerializer, TaskSerializer, EffectSerializer, TaskListSerializer
+from actoon.models import Project, Task, Effect, Media
+from actoon.serializer import ProjectSerializer, TaskSerializer, EffectSerializer, TaskListSerializer, MediaSerializer, \
+    UserSerializer
 from django.shortcuts import get_list_or_404, get_object_or_404
 
 
@@ -138,3 +141,72 @@ class EffectView(viewsets.ModelViewSet):
         instance = get_list_or_404(queryset)
         serializer = EffectSerializer(instance, many=True)
         return Response(serializer.data)
+
+
+class MediaView(viewsets.ModelViewSet):
+    serializer_class = MediaSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_queryset(self, project_name=None, media_id=None):
+        if project_name is not None:
+            project_instance = self.get_project(project_name)
+
+            if media_id is not None:
+                queryset_media_object = Media.objects.filter(pk=media_id)
+
+                if len(queryset_media_object) > 0:
+                    return queryset_media_object[0]
+            else:
+                if project_instance is not None:
+                    return Media.objects.filter(project=project_instance)
+
+        return None
+
+    def get_project(self, project_name):
+        user = self.request.user
+        queryset_project = Project.objects.filter(user=user).filter(name=project_name)
+        project_instance = get_list_or_404(queryset_project)
+
+        if len(project_instance) > 0:
+            return project_instance[0]
+
+        return None
+
+    def list(self, request, pk=None):
+        queryset = self.get_queryset(project_name=pk)
+
+        if queryset is not None:
+            instance = get_list_or_404(queryset)  # 404 if there are no media in project
+            serializer = self.get_serializer(instance, many=True)
+            return Response(serializer.data)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)  # no such project
+
+    def create(self, request, pk=None):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid() is True:
+            project = self.get_project(project_name=pk)
+
+            if project is not None:
+                self.perform_create(serializer, project=project)
+                return Response(status=status.HTTP_201_CREATED)
+
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        pass
+
+    def pre_save(self, obj):
+        obj.file = self.request.FILES.get('file')
+
+    def perform_create(self, serializer, project=None):
+        serializer.save(project=project)
+
+
+class RegisterView(viewsets.ModelViewSet):
+    model = get_user_model()
+    permission_classes = (permissions.AllowAny, )
+    serializer_class = UserSerializer

@@ -1,8 +1,10 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, logout
+from django.core.files.storage import default_storage
 from django.shortcuts import render_to_response, render, redirect, HttpResponse
 from django.template import RequestContext
+from rest_framework.response import Response
 
 from actoon.forms.login import LoginForm
 import json
@@ -49,3 +51,9 @@ def editor(request):
 @login_required(login_url='/login/')
 def profile(request):
     return render_wrapper(request,  './profile.html')
+
+
+# @login_required()
+def media(request):
+    file = request.path_info.split('/')[-1]
+    return HttpResponse(default_storage.open(file).read(), content_type='application/binary')

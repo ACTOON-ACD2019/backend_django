@@ -43,8 +43,23 @@ effect_list = api.EffectView.as_view({
     'get': 'list'           # get available effects
 })
 
+media_list = api.MediaView.as_view({
+    'get': 'list',
+    'put': 'create'
+})
+
+media_view = api.MediaView.as_view({
+    'delete': 'destroy'
+})
+
+register_view = api.RegisterView.as_view({
+    'post': 'create',
+    'patch': 'update'
+})
+
 urlpatterns = format_suffix_patterns([
     path('auth/', obtain_auth_token, name='auth'),
+    path('auth/register/', register_view, name='register'),
 
     path('project/', project_list, name='project_list'),
     path('project/<str:pk>/', project_view, name='project_desc'),
@@ -52,5 +67,8 @@ urlpatterns = format_suffix_patterns([
     path('task/<str:pk>/', task_list, name='task_list'),
     path('task/<str:pk>/<int:tpk>/', task_view, name='task_desc'),
 
-    path('effect/', effect_list, name='effect_list')
+    path('effect/', effect_list, name='effect_list'),
+
+    path('media/<str:pk>/', media_list, name='media_list'),
+    path('media/<str:pk>/<int:mpk>/', media_view, name='media_view')
 ])
