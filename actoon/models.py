@@ -27,11 +27,8 @@ class Action(models.Model):
         (ACTION_TYPE_UNDEFINED, 'Undefined')
     ]
 
-    action = models.CharField(max_length=4, choices=TYPE_ACTION, default=ACTION_TYPE_UNDEFINED)
-    pos_x_init = models.FloatField()
-    pos_y_init = models.FloatField()
-    pos_x_fin = models.FloatField()
-    pos_y_fin = models.FloatField()
+    type = models.CharField(max_length=4, choices=TYPE_ACTION, default=ACTION_TYPE_UNDEFINED)
+    parameters = models.CharField(max_length=255)
 
 
 # History (Task)
