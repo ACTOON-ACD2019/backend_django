@@ -10,6 +10,14 @@
           <option name="port" value="22" />
         </fileTransfer>
       </webServer>
+      <webServer id="86b567a8-1116-4015-82a7-fdeda6777657" name="ideaconcert" url="http://106.10.38.160">
+        <fileTransfer host="106.10.38.160" port="2022" rootFolder="/nipa/ACTOON/actoon_backend" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="2022" />
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>
