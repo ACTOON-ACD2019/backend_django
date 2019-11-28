@@ -49,7 +49,7 @@ effect_view = api.EffectView.as_view({
 
 media_list = api.MediaView.as_view({
     'get': 'list',
-    'put': 'create'
+    'post': 'create'
 })
 
 media_view = api.MediaView.as_view({
@@ -61,12 +61,22 @@ register_view = api.RegisterView.as_view({
     'patch': 'update'
 })
 
+cut_list = api.CutView.as_view({
+    'get': 'list',
+    'delete': 'destroy'
+})
+
+encode_view = api.EncodeView.as_view({
+    'get': 'retrieve'
+})
+
 urlpatterns = format_suffix_patterns([
     path('auth/', obtain_auth_token, name='auth'),
     path('auth/register/', register_view, name='register'),
 
     path('project/', project_list, name='project_list'),
     path('project/<str:pk>/', project_view, name='project_desc'),
+    path('project/<str:pk>/encode/', encode_view, name='task_encode'),
 
     path('task/<str:pk>/', task_list, name='task_list'),
     path('task/<str:pk>/<int:tpk>/', task_view, name='task_desc'),
@@ -75,5 +85,7 @@ urlpatterns = format_suffix_patterns([
     path('effect/<int:pk>/', effect_view, name='effect_desc'),
 
     path('media/<str:pk>/', media_list, name='media_list'),
-    path('media/<str:pk>/<int:mpk>/', media_view, name='media_view')
+    path('media/<str:pk>/<int:mpk>/', media_view, name='media_view'),
+
+    path('cut/<str:pk>/<int:mpk>/', cut_list, name='cut_list'),
 ])

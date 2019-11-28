@@ -66,11 +66,11 @@ async def request(loop, task, media=None):
     if task is 'cut_slicing':
         # make a rpc call
         response = await deeplearning_client.call_cut_slicing(media.file)
-        open('./media/temp/result_received.zip', 'wb').write(base64.b64decode(response))
+        open('./temp/result_received.zip', 'wb').write(base64.b64decode(response))
 
         # uncompressing zip
-        with zipfile.ZipFile('./media/temp/result_received.zip', 'r') as zip_ref:
-            zip_ref.extractall('./media/temp/')
+        with zipfile.ZipFile('./temp/result_received.zip', 'r') as zip_ref:
+            zip_ref.extractall('./temp/')
     else:
         # preprocessing histories
 

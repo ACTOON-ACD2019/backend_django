@@ -8,10 +8,12 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from actoon.models import Project, Task, Effect, Media, Cut
 from actoon.serializer import ProjectSerializer, TaskSerializer, EffectSerializer, TaskListSerializer, MediaSerializer, \
-    UserSerializer
+    UserSerializer, CutSerializer
 from django.shortcuts import get_list_or_404, get_object_or_404
 from actoon.apps import request as RpcRequest
 import os
+
+from actoon_backend import settings
 
 
 class ProjectView(viewsets.ModelViewSet):
@@ -217,13 +219,17 @@ class MediaView(viewsets.ModelViewSet):
                 loop.close()
 
                 # save files into database
-                for root, dirs, files in os.walk('./media/temp/'):
+                for root, dirs, files in os.walk('./temp/'):
                     for file in files:
                         fit = True
 
+                        file = File(open(os.path.join(root, file), 'rb'))
+                        new_path = os.path.basename(file.name)
+                        os.rename(file.name, new_path)
+
                         obj = Cut(
                             media=media,
-                            file=File(open(os.path.join(root, file), 'rb'))
+                            file=File(open(new_path, 'rb'))
                         )
 
                         if root.__contains__('bubble'):
@@ -237,7 +243,7 @@ class MediaView(viewsets.ModelViewSet):
                             obj.type = 'UD'
 
                         if fit:
-                            obj.sequence = int(file.split('.')[-2].split('_')[-1])
+                            obj.sequence = int(file.name.split('.')[-2].split('_')[-1])
                             obj.save()
 
                 # return object
@@ -262,3 +268,67 @@ class RegisterView(viewsets.ModelViewSet):
     model = get_user_model()
     permission_classes = (permissions.AllowAny,)
     serializer_class = UserSerializer
+
+
+class CutView(viewsets.ModelViewSet):
+    serializer_class = CutSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self, media=None):
+        if media is not None:
+            queryset = Cut.objects.filter(media=media)
+        else:
+            queryset = Cut.objects.all()
+
+        return queryset
+
+    def get_project(self, project_name):
+        user = self.request.user
+        queryset_project = Project.objects.filter(user=user).filter(name=project_name)
+        project_instance = get_list_or_404(queryset_project)
+
+        if len(project_instance) > 0:
+            return project_instance[0]
+
+        return None
+
+    def get_media(self, project=None):
+        queryset = Media.objects.filter(project=project)
+        instance = get_list_or_404(queryset)
+
+        if len(instance) > 0:
+            return instance
+
+        return None
+
+    def list(self, request, pk=None, mpk=None):
+        project = self.get_project(project_name=pk)
+
+        if project is not None:
+            media = self.get_media(project=project)
+
+            if len(media) >= mpk:
+                media_sel = media[mpk - 1]
+                queryset = self.get_queryset(media=media_sel).order_by('type')
+                instance = get_list_or_404(queryset)
+                serializer = self.get_serializer(instance, many=True)
+
+                return Response(serializer.data)
+
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class EncodeView(viewsets.ModelViewSet):
+    def get_project(self, project_name):
+        user = self.request.user
+        queryset_project = Project.objects.filter(user=user).filter(name=project_name)
+        project_instance = get_list_or_404(queryset_project)
+
+        if len(project_instance) > 0:
+            return project_instance[0]
+
+        return None
+
+    def retrieve(self, request, pk=None):
+        project_i = self.get_project(project_name=pk)
+        project_i

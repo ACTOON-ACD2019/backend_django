@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from actoon.models import Project, Task, Media, Effect
+from actoon.models import Project, Task, Media, Effect, Cut
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -55,10 +55,6 @@ class EffectSerializer(serializers.ModelSerializer):
         fields = ['name', 'required_parameters']
 
 
-class ParameterSerializer(serializers.Serializer):
-    pass
-
-
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
@@ -76,3 +72,9 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
 
         return user
+
+
+class CutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cut
+        fields = ['file', 'type', 'sequence']
