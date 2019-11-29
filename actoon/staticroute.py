@@ -15,11 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from actoon.views import static
-from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
-    url(r'^$', static.index, name='index'),
-    url(r'^editor/$', static.editor, name='editor'),
-    url(r'^profile/$', static.profile, name='profile'),
     url(r'^media/', static.media, name='media')
 ]

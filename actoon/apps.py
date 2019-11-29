@@ -58,21 +58,21 @@ class RpcClient:
 
         return await future
 
+    @staticmethod
+    async def request(loop, task, media=None):
+        deeplearning_client = await RpcClient(loop).connect()
+        print(" [x] Requesting cut slicing %s" % media.file)
 
-async def request(loop, task, media=None):
-    deeplearning_client = await RpcClient(loop).connect()
-    print(" [x] Requesting cut slicing %s" % media.file)
+        if task is 'cut_slicing':
+            # make a rpc call
+            response = await deeplearning_client.call_cut_slicing(media.file)
+            open('./temp/result_received.zip', 'wb').write(base64.b64decode(response))
 
-    if task is 'cut_slicing':
-        # make a rpc call
-        response = await deeplearning_client.call_cut_slicing(media.file)
-        open('./temp/result_received.zip', 'wb').write(base64.b64decode(response))
+            # uncompressing zip
+            with zipfile.ZipFile('./temp/result_received.zip', 'r') as zip_ref:
+                zip_ref.extractall('./temp/')
+        else:
+            # preprocessing histories
 
-        # uncompressing zip
-        with zipfile.ZipFile('./temp/result_received.zip', 'r') as zip_ref:
-            zip_ref.extractall('./temp/')
-    else:
-        # preprocessing histories
-
-        # go ahead
-        pass
+            # go ahead
+            pass

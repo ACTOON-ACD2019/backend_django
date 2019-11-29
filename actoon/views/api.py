@@ -10,7 +10,7 @@ from actoon.models import Project, Task, Effect, Media, Cut
 from actoon.serializer import ProjectSerializer, TaskSerializer, EffectSerializer, TaskListSerializer, MediaSerializer, \
     UserSerializer, CutSerializer
 from django.shortcuts import get_list_or_404, get_object_or_404
-from actoon.apps import request as RpcRequest
+from actoon.apps import RpcClient
 import os
 
 from actoon_backend import settings
@@ -215,7 +215,7 @@ class MediaView(viewsets.ModelViewSet):
 
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
-                loop.run_until_complete(RpcRequest(loop, 'cut_slicing', media))
+                loop.run_until_complete(RpcClient.request(loop, 'cut_slicing', media))
                 loop.close()
 
                 # save files into database
