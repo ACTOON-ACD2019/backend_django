@@ -1,41 +1,68 @@
+import os
 import asyncio
-
+from actoon import models as actoon_model
+from actoon import serializer as actoon_serializer
 from django.contrib.auth import get_user_model
 from django.core.files import File
-from rest_framework import status
-from rest_framework import viewsets, permissions
-from rest_framework.generics import CreateAPIView
+from django.shortcuts import get_list_or_404, get_object_or_404
+from rest_framework import status, viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.utils import json
-
-from actoon.models import Project, Task, Effect, Media, Cut
-from actoon.serializer import ProjectSerializer, TaskSerializer, EffectSerializer, TaskListSerializer, MediaSerializer, \
-    UserSerializer, CutSerializer
-from django.shortcuts import get_list_or_404, get_object_or_404
 from actoon.apps import RpcClient
-import os
 
-from actoon_backend import settings
+
+def get_media(project=None):
+    queryset = actoon_model.Media.objects\
+        .filter(project=project)
+    instance = get_list_or_404(queryset)
+
+    if len(instance) > 0:
+        return instance
+
+    return None
+
+
+def get_effect(name):
+    queryset_effect = actoon_model.Effect.objects\
+        .filter(name=name)
+    effect_instance = get_list_or_404(queryset_effect)
+
+    if len(effect_instance) > 0:
+        return effect_instance[0]
+
+    return None
+
+
+def get_project(user, project_name):
+    queryset_project = actoon_model.Project.objects\
+        .filter(user=user)\
+        .filter(name=project_name)
+    project_instance = get_list_or_404(queryset_project)
+
+    if len(project_instance) > 0:
+        return project_instance[0]
+
+    return None
 
 
 class ProjectView(viewsets.ModelViewSet):
-    serializer_class = ProjectSerializer
+    serializer_class = actoon_serializer.ProjectSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         user = self.request.user
-        return Project.objects.filter(user=user)
+        return actoon_model.Project.objects.filter(user=user)
 
     def list(self, request):
         queryset = self.get_queryset()
         instance = get_list_or_404(queryset)
-        serializer = ProjectSerializer(instance, many=True)
+        serializer = self.get_serializer(instance, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         queryset = self.get_queryset()
         instance = get_object_or_404(queryset, name=pk)
-        serializer = ProjectSerializer(instance)
+        serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
     def create(self, request):
@@ -66,7 +93,7 @@ class ProjectView(viewsets.ModelViewSet):
 
 
 class TaskView(viewsets.ModelViewSet):
-    serializer_class = TaskSerializer
+    serializer_class = actoon_serializer.TaskSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self, project_name=None, task_index=None):
@@ -74,33 +101,14 @@ class TaskView(viewsets.ModelViewSet):
             project_instance = self.get_project(project_name)
 
             if task_index is not None:
-                queryset_task_object = Task.objects.filter(project=project_instance) \
+                queryset_task_object = actoon_model.Task.objects.filter(project=project_instance) \
                     .order_by('created_at')
 
                 if len(queryset_task_object) > task_index:
                     return queryset_task_object[task_index - 1]
             else:
                 if project_instance is not None:
-                    return Task.objects.filter(project=project_instance).order_by('created_at')
-
-        return None
-
-    def get_project(self, name):
-        user = self.request.user
-        queryset_project = Project.objects.filter(user=user).filter(name=name)
-        project_instance = get_list_or_404(queryset_project)
-
-        if len(project_instance) > 0:
-            return project_instance[0]
-
-        return None
-
-    def get_effect(self, name):
-        queryset_effect = Effect.objects.filter(name=name)
-        effect_instance = get_list_or_404(queryset_effect)
-
-        if len(effect_instance) > 0:
-            return effect_instance[0]
+                    return actoon_model.Task.objects.filter(project=project_instance).order_by('created_at')
 
         return None
 
@@ -109,7 +117,7 @@ class TaskView(viewsets.ModelViewSet):
 
         if queryset is not None:
             instance = get_list_or_404(queryset)  # 404 if there are no tasks in project
-            serializer = TaskListSerializer(instance, many=True)
+            serializer = actoon_serializer.TaskListSerializer(instance, many=True)
             # serializer.validated_data.pop('project')  # remove project_id from task results
             return Response(serializer.data)
 
@@ -120,8 +128,8 @@ class TaskView(viewsets.ModelViewSet):
             serializer = self.get_serializer(data=request.data)
 
             if serializer.is_valid() is True:
-                effect = self.get_effect(serializer.validated_data['effect_name'])  # sets the effect object
-                project = self.get_project(pk)  # get projects to insert task
+                effect = get_effect(serializer.validated_data['effect_name'])  # sets the effect object
+                project = get_project(self.request.user, pk)  # get projects to insert task
 
                 if project is not None:
                     self.perform_create(serializer, effect, project)
@@ -143,56 +151,47 @@ class TaskView(viewsets.ModelViewSet):
 
 
 class EffectView(viewsets.ModelViewSet):
-    queryset = Effect.objects.all()
+    queryset = actoon_model.Effect.objects.all()
+    serializer_class = actoon_serializer.EffectSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self, pk=None):
         if pk is not None:
-            queryset = Effect.objects.all(pk=pk)
+            queryset = actoon_model.Effect.objects.all(pk=pk)
         else:
-            queryset = Effect.objects.all()
+            queryset = actoon_model.Effect.objects.all()
 
         return queryset
 
     def list(self, request):
         queryset = self.get_queryset()
         instance = get_list_or_404(queryset)
-        serializer = EffectSerializer(instance, many=True)
+        serializer = self.get_serializer(instance, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         queryset = self.get_queryset()
         instance = get_object_or_404(queryset)
-        serializer = EffectSerializer(instance)
+        serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
 
 class MediaView(viewsets.ModelViewSet):
-    serializer_class = MediaSerializer
+    serializer_class = actoon_serializer.MediaSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self, project_name=None, media_id=None):
         if project_name is not None:
-            project_instance = self.get_project(project_name)
+            project_instance = get_project(self.request.user, project_name)
 
             if media_id is not None:
-                queryset_media_object = Media.objects.filter(pk=media_id)
+                queryset_media_object = actoon_model.Media.objects.filter(pk=media_id)
 
                 if len(queryset_media_object) > 0:
                     return queryset_media_object[0]
             else:
                 if project_instance is not None:
-                    return Media.objects.filter(project=project_instance)
-
-        return None
-
-    def get_project(self, project_name):
-        user = self.request.user
-        queryset_project = Project.objects.filter(user=user).filter(name=project_name)
-        project_instance = get_list_or_404(queryset_project)
-
-        if len(project_instance) > 0:
-            return project_instance[0]
+                    return actoon_model.Media.objects.filter(project=project_instance)
 
         return None
 
@@ -210,7 +209,7 @@ class MediaView(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid() is True:
-            project = self.get_project(project_name=pk)
+            project = get_project(self.request.user, project_name=pk)
 
             if project is not None:
                 media = self.perform_create(serializer, project=project)
@@ -229,7 +228,7 @@ class MediaView(viewsets.ModelViewSet):
                         new_path = os.path.basename(file.name)
                         os.rename(file.name, new_path)
 
-                        obj = Cut(
+                        obj = actoon_model.Cut(
                             media=media,
                             file=File(open(new_path, 'rb'))
                         )
@@ -269,49 +268,30 @@ class MediaView(viewsets.ModelViewSet):
 class RegisterView(viewsets.ModelViewSet):
     model = get_user_model()
     permission_classes = (permissions.AllowAny,)
-    serializer_class = UserSerializer
+    serializer_class = actoon_serializer.UserSerializer
 
 
 class CutView(viewsets.ModelViewSet):
-    serializer_class = CutSerializer
+    serializer_class = actoon_serializer.CutSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self, media=None):
         if media is not None:
-            queryset = Cut.objects.filter(media=media)
+            queryset = actoon_model.Cut.objects.filter(media=media)
         else:
-            queryset = Cut.objects.all()
+            queryset = actoon_model.Cut.objects.all()
 
         return queryset
 
-    def get_project(self, project_name):
-        user = self.request.user
-        queryset_project = Project.objects.filter(user=user).filter(name=project_name)
-        project_instance = get_list_or_404(queryset_project)
-
-        if len(project_instance) > 0:
-            return project_instance[0]
-
-        return None
-
-    def get_media(self, project=None):
-        queryset = Media.objects.filter(project=project)
-        instance = get_list_or_404(queryset)
-
-        if len(instance) > 0:
-            return instance
-
-        return None
-
     def list(self, request, pk=None):
-        project = self.get_project(project_name=pk)
+        project = get_project(self.request.user, project_name=pk)
 
         if project is not None:
-            media = self.get_media(project=project)
+            media = get_media(project=project)
             data = []
 
             for media_s in media:
-                cut_individual = Cut.objects.filter(media=media_s)
+                cut_individual = actoon_model.Cut.objects.filter(media=media_s)
                 instance = get_list_or_404(cut_individual)
                 serializer = self.get_serializer(instance, many=True)
                 _array = []
@@ -324,19 +304,3 @@ class CutView(viewsets.ModelViewSet):
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class EncodeView(viewsets.ModelViewSet):
-    def get_project(self, project_name):
-        user = self.request.user
-        queryset_project = Project.objects.filter(user=user).filter(name=project_name)
-        project_instance = get_list_or_404(queryset_project)
-
-        if len(project_instance) > 0:
-            return project_instance[0]
-
-        return None
-
-    def retrieve(self, request, pk=None):
-        project_i = self.get_project(project_name=pk)
-        project_i
