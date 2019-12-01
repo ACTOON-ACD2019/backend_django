@@ -1,18 +1,14 @@
 from django.apps import AppConfig
 import uuid
-import json
 from aio_pika import connect, IncomingMessage, Message
-from django.core.files import File
 import base64
-import asyncio
 import zipfile
-import os
-
-# from actoon.models import Cut
 
 
 class ActoonConfig(AppConfig):
     name = 'actoon'
+    rpc_connection = 'amqp://test:test1234@beta.actoon.sokdak.me/'
+    rpc_queue_cut_slicing = 'rpc_cut_slicing_queue'
 
 
 class RpcClient:
@@ -25,7 +21,7 @@ class RpcClient:
 
     async def connect(self):
         self.connection = await connect(
-            "amqp://test:test1234@beta.actoon.sokdak.me/", loop=self.loop
+            ActoonConfig.rpc_connection, loop=self.loop
         )
         self.channel = await self.connection.channel()
         self.callback_queue = await self.channel.declare_queue(
@@ -40,7 +36,7 @@ class RpcClient:
         future.set_result(message.body)
 
     async def call_cut_slicing(self, filename):
-        hexa = open(filename.file.name, 'rb').read()
+        data = open(filename.file.name, 'rb').read()
         correlation_id = str(uuid.uuid4())
         future = self.loop.create_future()
 
@@ -48,31 +44,30 @@ class RpcClient:
 
         await self.channel.default_exchange.publish(
             Message(
-                base64.b64encode(hexa),
+                base64.b64encode(data),
                 content_type=filename.file.name.split('.')[-1],
                 correlation_id=correlation_id,
                 reply_to=self.callback_queue.name,
             ),
-            routing_key='rpc_cut_slicing_queue',
+            routing_key=ActoonConfig.rpc_queue_cut_slicing,
         )
 
         return await future
 
     @staticmethod
     async def request(loop, task, media=None):
-        deeplearning_client = await RpcClient(loop).connect()
+        deep_learning_client = await RpcClient(loop).connect()
         print(" [x] Requesting cut slicing %s" % media.file)
 
         if task is 'cut_slicing':
             # make a rpc call
-            response = await deeplearning_client.call_cut_slicing(media.file)
+            response = await deep_learning_client.call_cut_slicing(media.file)
             open('./temp/result_received.zip', 'wb').write(base64.b64decode(response))
 
             # uncompressing zip
             with zipfile.ZipFile('./temp/result_received.zip', 'r') as zip_ref:
                 zip_ref.extractall('./temp/')
-        else:
-            # preprocessing histories
-
-            # go ahead
+        elif task is 'task_encoding':
+            pass
+        elif task is 'text_recognizing':
             pass

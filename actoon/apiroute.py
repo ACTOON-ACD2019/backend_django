@@ -66,17 +66,12 @@ cut_list = api.CutView.as_view({
     'delete': 'destroy'
 })
 
-encode_view = api.EncodeView.as_view({
-    'get': 'retrieve'
-})
-
 urlpatterns = format_suffix_patterns([
     path('auth/', obtain_auth_token, name='auth'),
     path('auth/register/', register_view, name='register'),
 
     path('project/', project_list, name='project_list'),
     path('project/<str:pk>/', project_view, name='project_desc'),
-    path('project/<str:pk>/encode/', encode_view, name='task_encode'),
 
     path('task/<str:pk>/', task_list, name='task_list'),
     path('task/<str:pk>/<int:tpk>/', task_view, name='task_desc'),
