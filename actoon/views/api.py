@@ -49,9 +49,14 @@ class ProjectView(viewsets.ModelViewSet):
     serializer_class = actoon_serializer.ProjectSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-    def get_queryset(self):
+    def get_queryset(self, name=None):
         user = self.request.user
-        return actoon_model.Project.objects.filter(user=user)
+
+        if name is None:
+            return actoon_model.Project.objects.filter(user=user)
+        else:
+            return actoon_model.Project.objects\
+                .filter(user=user).filter(name=name)
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -98,7 +103,7 @@ class TaskView(viewsets.ModelViewSet):
 
     def get_queryset(self, project_name=None, task_index=None):
         if project_name is not None:
-            project_instance = self.get_project(project_name)
+            project_instance = get_project(self.request.user, project_name)
 
             if task_index is not None:
                 queryset_task_object = actoon_model.Task.objects.filter(project=project_instance) \
@@ -220,7 +225,7 @@ class MediaView(viewsets.ModelViewSet):
                 loop.close()
 
                 # save files into database
-                for root, dirs, files in os.walk('./temp/'):
+                for root, files in os.walk('./temp/'):
                     for file in files:
                         fit = True
 
