@@ -87,5 +87,5 @@ urlpatterns = format_suffix_patterns([
     path('media/<str:pk>/', media_list, name='media_list'),
     path('media/<str:pk>/<int:mpk>/', media_view, name='media_view'),
 
-    path('cut/<str:pk>/<int:mpk>/', cut_list, name='cut_list'),
+    path('cut/<str:pk>/', cut_list, name='cut_list'),
 ])
