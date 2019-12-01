@@ -6,6 +6,8 @@ from rest_framework import status
 from rest_framework import viewsets, permissions
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
+from rest_framework.utils import json
+
 from actoon.models import Project, Task, Effect, Media, Cut
 from actoon.serializer import ProjectSerializer, TaskSerializer, EffectSerializer, TaskListSerializer, MediaSerializer, \
     UserSerializer, CutSerializer
@@ -301,21 +303,27 @@ class CutView(viewsets.ModelViewSet):
 
         return None
 
-    def list(self, request, pk=None, mpk=None):
+    def list(self, request, pk=None):
         project = self.get_project(project_name=pk)
 
         if project is not None:
             media = self.get_media(project=project)
+            data = []
 
-            if len(media) >= mpk:
-                media_sel = media[mpk - 1]
-                queryset = self.get_queryset(media=media_sel).order_by('type')
-                instance = get_list_or_404(queryset)
+            for media_s in media:
+                cut_individual = Cut.objects.filter(media=media_s)
+                instance = get_list_or_404(cut_individual)
                 serializer = self.get_serializer(instance, many=True)
+                _array = []
+                _array += serializer.data
+                data.append(_array)
 
-                return Response(serializer.data)
+            if len(data) > 0:
+                return Response(json.dumps(data))
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
 
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class EncodeView(viewsets.ModelViewSet):
