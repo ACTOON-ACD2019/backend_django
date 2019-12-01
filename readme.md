@@ -31,15 +31,17 @@ $ python ./manage.py makemigrations actoon
 $ python ./manage.py migrate
 ```
 
-And run the django server on-air.
+
+## Deployment
+
+Run the django server on-the-air.
+
 
 ```
 $ python ./manage.py runserver
 ```
 
-## Deployment
-
-We are preparing on live-deployment for this project now.
+You can serve django with a reverse-proxy setup with nginx, apache, caddy and the others that supports reverse proxy function.
 
 ## Built With
 
@@ -50,13 +52,13 @@ We are preparing on live-deployment for this project now.
 
 ## Versioning
 
-We use GitHub's tag for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+We use GitHub's tag for versioning. For the versions available, see the [tags on this repository](https://github.com/ACTOON-ACD2019/backend_django/tags). 
 
 ## Authors
 
 * **Dongkyun Yoo** - *Backend, Platform/Infrastructure Engineering* - [sokdak](https://github.com/k3nuku)
 
-See also the list of [contributors](https://github.com/backend_django/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/ACTOON-ACD2019/backend_django/contributors) who participated in this project.
 
 ## License
 
