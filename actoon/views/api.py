@@ -80,9 +80,23 @@ class ProjectView(viewsets.ModelViewSet):
                 self.perform_create(serializer, user=self.request.user)
                 return Response(status=status.HTTP_201_CREATED)
 
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response({'errors': 'given project name has been already taken'}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, pk=None):
+        queryset = self.get_queryset(pk)
+        instance = get_object_or_404(queryset)
+        serializer = self.get_serializer(instance, data=request.data)
+
+        if serializer.is_valid():
+            if pk != serializer.validated_data['name']:
+                self.perform_update(serializer)
+                return Response(status=status.HTTP_202_ACCEPTED)
+            else:
+                return Response({'errors': 'Name cannot be same used before'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
         queryset = self.get_queryset(name=pk)
@@ -91,7 +105,7 @@ class ProjectView(viewsets.ModelViewSet):
             self.perform_destroy(queryset)
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response({'errors': 'no such project'}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer, user):
         return serializer.save(user=self.request.user)
