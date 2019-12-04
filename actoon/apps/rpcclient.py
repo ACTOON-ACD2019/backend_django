@@ -8,7 +8,7 @@ import pathlib
 
 from aio_pika import connect, IncomingMessage, Message
 from django.core.files import File
-from actoon_backend.settings import MEDIA_ROOT
+from actoon_backend.settings import MEDIA_ROOT, BASE_DIR
 from actoon.apps.renamer import create_random_name
 
 
@@ -40,7 +40,7 @@ class SingletonDecorator:
 class RpcClient:
     rpc_connection = 'amqp://guest:guest@127.0.0.1/'
     rpc_queue_cut_slicing = 'rpc_cut_slicing_queue'
-    temp_folder = '/tmp/actoon/'
+    temp_folder = BASE_DIR + '/temp/'
 
     def __init__(self):
         self.connection = None
@@ -135,9 +135,9 @@ class RpcClient:
     @staticmethod
     async def encode_request(task, media=None):
         print(" [x] Requesting encoding")
-        pass
+        # should be implemented
 
     @staticmethod
     async def text_recognize(task, media=None):
         print(" [x] Requesting text recognition from cut")
-        pass
+        # should be implemented
