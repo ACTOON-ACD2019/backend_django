@@ -38,7 +38,7 @@ class SingletonDecorator:
 
 @SingletonDecorator
 class RpcClient:
-    rpc_connection = 'amqp://actoon_client:zhekfl12!@mq.actoon.sokdak.me/'
+    rpc_connection = 'amqp://guest:guest@127.0.0.1/'
     rpc_queue_cut_slicing = 'rpc_cut_slicing_queue'
     temp_folder = '/tmp/actoon/'
 
