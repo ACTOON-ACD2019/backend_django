@@ -1,5 +1,3 @@
-import os
-import asyncio
 from actoon import models as actoon_model
 from actoon import serializer as actoon_serializer
 from django.contrib.auth import get_user_model
