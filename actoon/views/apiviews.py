@@ -90,8 +90,8 @@ class ProjectView(viewsets.ModelViewSet):
         if serializer.is_valid():
             instance.name = serializer.validated_data['name']
 
-            if instance.description != serializer.validate_data['description']:
-                instance.description = serializer.validate_data['description']
+            if instance.description != serializer.validated_data['description']:
+                instance.description = serializer.validated_data['description']
 
             instance.save()
 
