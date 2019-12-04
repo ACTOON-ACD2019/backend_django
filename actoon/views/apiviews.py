@@ -90,11 +90,14 @@ class ProjectView(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data)
 
         if serializer.is_valid():
-            if pk != serializer.validated_data['name']:
-                self.perform_update(serializer)
-                return Response(status=status.HTTP_202_ACCEPTED)
-            else:
-                return Response({'errors': 'Name cannot be same used before'}, status=status.HTTP_400_BAD_REQUEST)
+            instance.name = serializer.validated_data['name']
+
+            if instance.description != serializer.validate_data['description']:
+                instance.description = serializer.validate_data['description']
+
+            instance.save()
+
+            return Response(status=status.HTTP_202_ACCEPTED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
