@@ -17,6 +17,8 @@ class TaskListSerializer(serializers.ModelSerializer):
         model = Task
         fields = [
             'effect',
+            'cut',
+            'image_properties',
             'project',
             'parameters',
             'created_at'
@@ -31,6 +33,8 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = [
             'effect',
             'effect_name',
+            'cut',
+            'image_properties',
             'project',
             'parameters',
             'created_at'

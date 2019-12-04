@@ -8,7 +8,7 @@ from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import status, viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.utils import json
-from actoon.apps import RpcClient
+from actoon.apps.rpcclient import RpcClient
 
 
 def get_media(project=None):
@@ -140,7 +140,8 @@ class TaskView(viewsets.ModelViewSet):
             # serializer.validated_data.pop('project')  # remove project_id from task results
             return Response(serializer.data)
 
-        return Response(status=status.HTTP_400_BAD_REQUEST)  # no such project
+        return Response({'errors': 'no such project'},
+                        status=status.HTTP_400_BAD_REQUEST)  # no such project
 
     def create(self, request, pk=None):
         if request.data.__contains__('effect_name'):  # validate on server-side
@@ -153,8 +154,10 @@ class TaskView(viewsets.ModelViewSet):
                 if project is not None:
                     self.perform_create(serializer, effect, project)
                     return Response(status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # no effect name
 
-        return Response(status=status.HTTP_400_BAD_REQUEST)  # no effect name
+        return Response({'errors': 'no effect name'}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None, tpk=None):
         instance = self.get_queryset(project_name=pk, task_index=tpk)
@@ -163,7 +166,7 @@ class TaskView(viewsets.ModelViewSet):
             self.perform_destroy(instance)
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response({'errors': 'no such project or index'}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer, effect, project):
         serializer.save(effect=effect, project=project)
@@ -233,46 +236,27 @@ class MediaView(viewsets.ModelViewSet):
             if project is not None:
                 media = self.perform_create(serializer, project=project)
 
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                loop.run_until_complete(RpcClient.request(loop, 'cut_slicing', media))
-                loop.close()
+                rpc_client = RpcClient()
+                rpc_loop = rpc_client.loop
 
-                # save files into database
-                for root, files in os.walk('./temp/'):
-                    for file in files:
-                        fit = True
+                files = rpc_loop.run_until_complete(rpc_client.cut_slicing_request(media))
 
-                        file = File(open(os.path.join(root, file), 'rb'))
-                        new_path = os.path.basename(file.name)
-                        os.rename(file.name, new_path)
+                for data in files:
+                    obj = actoon_model.Cut(
+                        media=media,
+                        file=File(open(data['file'], 'rb'))
+                    )
 
-                        obj = actoon_model.Cut(
-                            media=media,
-                            file=File(open(new_path, 'rb'))
-                        )
-
-                        if root.__contains__('bubble'):
-                            obj.type = 'BU'
-                        elif root.__contains__('cut'):
-                            obj.type = 'SC'
-                        elif root.__contains__('text'):
-                            obj.type = 'TX'
-                        else:
-                            fit = False
-                            obj.type = 'UD'
-
-                        if fit:
-                            obj.sequence = int(file.name.split('.')[-2].split('_')[-1])
-                            obj.save()
-
-                # return object
+                    # getting file
+                    obj.type = data['type']
+                    obj.sequence = data['sequence']
+                    obj.save()
 
                 return Response(status=status.HTTP_201_CREATED)
 
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response({'errors': 'not such project'}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
         pass

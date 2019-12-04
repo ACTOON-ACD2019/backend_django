@@ -62,9 +62,10 @@ class Cut(models.Model):
 # merging Action and Task model to simplify model
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    # cut = models.ForeignKey(Cut, on_delete=models.CASCADE)
+    cut = models.ForeignKey(Cut, on_delete=models.CASCADE)
     effect = models.ForeignKey(Effect, on_delete=models.CASCADE)
     parameters = models.CharField(max_length=255)
+    image_properties = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
 

@@ -15,53 +15,53 @@ Including another URLconf
 """
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
-from actoon.views import api
+from actoon.views import apiviews
 from rest_framework.authtoken.views import obtain_auth_token
 
-project_list = api.ProjectView.as_view({
+project_list = apiviews.ProjectView.as_view({
     'get': 'list',
     'put': 'create'
 })
 
-project_view = api.ProjectView.as_view({
+project_view = apiviews.ProjectView.as_view({
     'get': 'retrieve',      # retrieve projects
     'patch': 'update',      # update project description
     'delete': 'destroy'     # delete project
 })
 
-task_list = api.TaskView.as_view({
+task_list = apiviews.TaskView.as_view({
     'get': 'list',          # list of tasks
     'put': 'create',        # create a new task with a specified action
 })
 
-task_view = api.TaskView.as_view({
+task_view = apiviews.TaskView.as_view({
     'delete': 'destroy'      # delete the task
     # depends on history-based management, update the task won't be supported
 })
 
-effect_list = api.EffectView.as_view({
+effect_list = apiviews.EffectView.as_view({
     'get': 'list'           # get available effects
 })
 
-effect_view = api.EffectView.as_view({
+effect_view = apiviews.EffectView.as_view({
     'get': 'retrieve'
 })
 
-media_list = api.MediaView.as_view({
+media_list = apiviews.MediaView.as_view({
     'get': 'list',
     'post': 'create'
 })
 
-media_view = api.MediaView.as_view({
+media_view = apiviews.MediaView.as_view({
     'delete': 'destroy'
 })
 
-register_view = api.RegisterView.as_view({
+register_view = apiviews.RegisterView.as_view({
     'post': 'create',
     'patch': 'update'
 })
 
-cut_list = api.CutView.as_view({
+cut_list = apiviews.CutView.as_view({
     'get': 'list',
     'delete': 'destroy'
 })
