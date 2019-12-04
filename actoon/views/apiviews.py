@@ -245,12 +245,11 @@ class MediaView(viewsets.ModelViewSet):
                 for data in files:
                     obj = actoon_model.Cut(
                         media=media,
-                        file=File(open(data['file'], 'rb'))
+                        file=data['file'],
+                        type=data['type'],
+                        sequence=data['sequence']
                     )
 
-                    # getting file
-                    obj.type = data['type']
-                    obj.sequence = data['sequence']
                     obj.save()
 
                 return Response(status=status.HTTP_201_CREATED)

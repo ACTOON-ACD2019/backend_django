@@ -53,7 +53,7 @@ class Cut(models.Model):
     ]
 
     media = models.ForeignKey(Media, on_delete=models.CASCADE)
-    file = models.FileField(blank=False, null=False)
+    file = models.CharField(max_length=255)
     type = models.CharField(max_length=2, choices=TYPE_PROCEEDED, default=TYPE_UNDEFINED)
     sequence = models.IntegerField()
 
