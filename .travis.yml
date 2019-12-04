@@ -11,3 +11,11 @@ install:
 
 script:
   - python ./manage.py test
+
+services:
+  - rabbitmq
+
+addons:
+  apt:
+    packages:
+      - rabbitmq-server
