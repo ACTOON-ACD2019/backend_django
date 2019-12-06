@@ -9,10 +9,6 @@ class ActoonConfig(AppConfig):
     name = 'actoon'
 
     def ready(self):
-        # initializing custom event loop
-        print(' [x] initializing rpc client')
-        RpcClient()
-
         # creating temporary folder
         print(' [x] creating temporary folder')
         if not os.path.exists(BASE_DIR + '/temp/'):

@@ -36,20 +36,17 @@ class SingletonDecorator:
         return self.instance
 
 
-@SingletonDecorator
 class RpcClient:
     rpc_connection = 'amqp://guest:guest@127.0.0.1/'
     rpc_queue_cut_slicing = 'rpc_cut_slicing_queue'
     temp_folder = BASE_DIR + '/temp/'
 
-    def __init__(self):
+    def __init__(self, loop):
         self.connection = None
         self.channel = None
         self.callback_queue = None
         self.futures = {}
-        self.loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(self.loop)
-        self.loop.run_until_complete(self.connect())
+        self.loop = loop
 
     async def connect(self):
         self.connection = await connect(
@@ -87,7 +84,7 @@ class RpcClient:
         return await future
 
     async def cut_slicing_request(self, media):
-        print(" [x] Requesting cut slicing %s" % media.file)
+        print(" [x] Requesting cut slicing %s with event loop" % media.file)
 
         # make a rpc call
         response = await self.call_cut_slicing(media.file)

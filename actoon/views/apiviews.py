@@ -1,12 +1,10 @@
 from actoon import models as actoon_model
 from actoon import serializer as actoon_serializer
 from django.contrib.auth import get_user_model
-from django.core.files import File
 from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import status, viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.utils import json
-from actoon.apps.rpcclient import RpcClient
 
 
 def get_media(project=None):
@@ -235,23 +233,7 @@ class MediaView(viewsets.ModelViewSet):
             project = get_project(self.request.user, project_name=pk)
 
             if project is not None:
-                media = self.perform_create(serializer, project=project)
-
-                rpc_client = RpcClient()
-                rpc_loop = rpc_client.loop
-
-                files = rpc_loop.run_until_complete(rpc_client.cut_slicing_request(media))
-
-                for data in files:
-                    obj = actoon_model.Cut(
-                        media=media,
-                        file=data['file'],
-                        type=data['type'],
-                        sequence=data['sequence']
-                    )
-
-                    obj.save()
-
+                self.perform_create(serializer, project=project)
                 return Response(status=status.HTTP_201_CREATED)
 
             return Response({'errors': 'not such project'}, status=status.HTTP_400_BAD_REQUEST)
