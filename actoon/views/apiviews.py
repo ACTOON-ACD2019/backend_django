@@ -277,11 +277,39 @@ class CutView(viewsets.ModelViewSet):
 
             for media_s in media:
                 cut_individual = actoon_model.Cut.objects.filter(media=media_s)
-                instance = get_list_or_404(cut_individual)
-                serializer = self.get_serializer(instance, many=True)
-                _array = []
-                _array += serializer.data
-                data.append(_array)
+                instances = get_list_or_404(cut_individual)
+
+                # arrange with cut sequence
+                instances.sort(key=lambda x: x.sequence)
+
+                bubbles = []
+                cuts = []
+                full_cuts = []
+
+                for instance in instances:
+                    if instance.type == 'SC':
+                        cuts.append(instance)
+                    elif instance.type == 'FC':
+                        full_cuts.append(instance)
+                    elif instance.type == 'BU':
+                        bubbles.append(instance)
+
+                # make a empty field
+                for index, cut in enumerate(cuts):
+                    bubbles_in_cut = []
+
+                    for bubble in bubbles:
+                        if bubble.sequence is index:
+                            bubbles_in_cut.append(
+                                self.get_serializer(bubble).data)
+
+                    _data = {
+                        'thumbnail': self.get_serializer(full_cuts[index]).data,
+                        'background': self.get_serializer(cut).data,
+                        'bubbles': bubbles_in_cut
+                    }
+
+                    data.append(_data)
 
             if len(data) > 0:
                 return Response(json.dumps(data))

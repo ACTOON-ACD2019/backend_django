@@ -1,5 +1,6 @@
 import asyncio
 import base64
+import json
 import os
 import uuid
 import zipfile
@@ -25,15 +26,39 @@ def cleanup_folder(folder):
             print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 
-class SingletonDecorator:
-    def __init__(self, klass):
-        self.klass = klass
-        self.instance = None
+def load_files(random_file, cut_type):
+    return_list = []
 
-    def __call__(self, *args, **kwds):
-        if self.instance is None:
-            self.instance = self.klass(*args, **kwds)
-        return self.instance
+    if cut_type is not 'final':
+        # search provided types
+        for root, dirs, files in os.walk(random_file + '.extracted/test/predictions/' + cut_type + '/'):
+            for file in files:
+                file = File(open(os.path.join(root, file), 'rb'))
+                new_name = create_random_name(MEDIA_ROOT, pathlib.Path(file.name).suffix)
+                new_path = MEDIA_ROOT + new_name
+                os.rename(file.name, new_path)
+
+                context = {
+                    'type': cut_type,
+                    'sequence': int(file.name.split('.')[-2].split('_')[-1]),
+                    'file': new_name
+                }
+
+                return_list.append(context)
+
+        return_list.sort(key=lambda x: x['sequence'])
+    else:
+        file = File(open(random_file + '.extracted/test/predictions/final/1.jpg'))
+        new_name = create_random_name(MEDIA_ROOT, pathlib.Path(file.name).suffix)
+        new_path = MEDIA_ROOT + new_name
+        os.rename(file.name, new_path)
+
+        return_list.append({
+            'file': new_name,
+            'type': 'proceeded_result'
+        })
+
+    return return_list
 
 
 class RpcClient:
@@ -90,44 +115,31 @@ class RpcClient:
         print(" [x] Requesting cut slicing %s with event loop" % media.file)
 
         # make a rpc call
-        response = await self.call_cut_slicing(media.file)
+        response = json.loads(
+            base64.b64decode(
+                str(await self.call_cut_slicing(media.file),
+                    'utf-8')))
+
         await self.close()
 
         random_name = create_random_name(self.temp_folder, '.zip')
         random_file = self.temp_folder + random_name
 
-        open(random_file, 'wb').write(base64.b64decode(response))
+        open(random_file, 'wb').write(base64.b64decode(response['data']))
 
         # uncompressing zip
         with zipfile.ZipFile(random_file, 'r') as zip_ref:
             os.mkdir(random_file + '.extracted')
             zip_ref.extractall(random_file + '.extracted')
 
-        return_val = []
-
-        # walking into directories
-        for root, dirs, files in os.walk(random_file + '.extracted' + '/test/predictions'):
-            for file in files:
-                file = File(open(os.path.join(root, file), 'rb'))
-                new_name = create_random_name(MEDIA_ROOT, pathlib.Path(file.name).suffix)
-                new_path = MEDIA_ROOT + new_name
-                os.rename(file.name, new_path)
-
-                context = {}
-
-                if file.name.__contains__('bubble'):
-                    cut_type = 'bubble'
-                elif file.name.__contains__('cut'):
-                    cut_type = 'cut'
-                elif file.name.__contains__('text'):
-                    cut_type = 'text'
-                else:
-                    continue
-
-                context['file'] = new_name
-                context['type'] = cut_type
-                context['sequence'] = int(file.name.split('.')[-2].split('_')[-1])
-                return_val.append(context)
+        # search cut/bubble/rect_cut/final images
+        return_val = {
+            'cut_info': json.loads(response['header']),
+            'cut': load_files(random_file, 'cut'),
+            'bubble': load_files(random_file, 'bubble'),
+            'rect_cut': load_files(random_file, 'rect_cut'),
+            'final': load_files(random_file, 'final')[0]
+        }
 
         cleanup_folder(self.temp_folder)
 
