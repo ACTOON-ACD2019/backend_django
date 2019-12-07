@@ -81,4 +81,4 @@ class UserSerializer(serializers.ModelSerializer):
 class CutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cut
-        fields = ['file', 'type', 'sequence']
+        fields = ['file', 'type', 'sequence', 'sub_sequence', 'pos_x', 'pos_y']
