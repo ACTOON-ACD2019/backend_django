@@ -47,6 +47,10 @@ class RpcClient:
         self.callback_queue = None
         self.futures = {}
         self.loop = loop
+        self.correlation_id = str(uuid.uuid4())
+
+    async def close(self):
+        await self.connection.close()
 
     async def connect(self):
         self.connection = await connect(
@@ -56,7 +60,7 @@ class RpcClient:
         self.callback_queue = await self.channel.declare_queue(
             exclusive=True
         )
-        await self.callback_queue.consume(self.on_response)
+        await self.callback_queue.consume(self.on_response, no_ack=True)
 
         return self
 
@@ -66,16 +70,15 @@ class RpcClient:
 
     async def call_cut_slicing(self, filename):
         data = open(filename.file.name, 'rb').read()
-        correlation_id = str(uuid.uuid4())
         future = self.loop.create_future()
 
-        self.futures[correlation_id] = future
+        self.futures[self.correlation_id] = future
 
         await self.channel.default_exchange.publish(
             Message(
                 base64.b64encode(data),
                 content_type=filename.file.name.split('.')[-1],
-                correlation_id=correlation_id,
+                correlation_id=self.correlation_id,
                 reply_to=self.callback_queue.name,
             ),
             routing_key=self.rpc_queue_cut_slicing,
@@ -88,6 +91,7 @@ class RpcClient:
 
         # make a rpc call
         response = await self.call_cut_slicing(media.file)
+        await self.close()
 
         random_name = create_random_name(self.temp_folder, '.zip')
         random_file = self.temp_folder + random_name
