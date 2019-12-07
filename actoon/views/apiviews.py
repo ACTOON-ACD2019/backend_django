@@ -233,8 +233,9 @@ class MediaView(viewsets.ModelViewSet):
             project = get_project(self.request.user, project_name=pk)
 
             if project is not None:
-                self.perform_create(serializer, project=project)
-                return Response(status=status.HTTP_201_CREATED)
+                instance = self.perform_create(serializer, project=project)
+                return Response(self.get_serializer(instance).data,
+                                status=status.HTTP_201_CREATED)
 
             return Response({'errors': 'not such project'}, status=status.HTTP_400_BAD_REQUEST)
 
