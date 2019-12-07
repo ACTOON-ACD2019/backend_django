@@ -49,8 +49,8 @@ class TaskSerializer(serializers.ModelSerializer):
 class MediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Media
-        fields = ['media_type', 'project', 'file', 'proceeded']
-        read_only_fields = ['project', 'proceeded']
+        fields = ['media_type', 'project', 'file', 'proceeded', 'proceeded_image']
+        read_only_fields = ['project', 'proceeded', 'proceeded_image']
 
 
 class EffectSerializer(serializers.ModelSerializer):
