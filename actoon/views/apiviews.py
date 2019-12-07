@@ -73,8 +73,8 @@ class ProjectView(viewsets.ModelViewSet):
             queryset = self.get_queryset().filter(name=serializer.validated_data['name'])
 
             if queryset.count() is 0:
-                self.perform_create(serializer, user=self.request.user)
-                return Response(status=status.HTTP_201_CREATED)
+                instance = self.perform_create(serializer, user=self.request.user)
+                return Response(self.get_serializer(instance).data, status=status.HTTP_201_CREATED)
 
             return Response({'errors': 'given project name has been already taken'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -93,7 +93,7 @@ class ProjectView(viewsets.ModelViewSet):
 
             instance.save()
 
-            return Response(status=status.HTTP_202_ACCEPTED)
+            return Response(self.get_serializer(instance).data, status=status.HTTP_202_ACCEPTED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -151,8 +151,8 @@ class TaskView(viewsets.ModelViewSet):
                 project = get_project(self.request.user, pk)  # get projects to insert task
 
                 if project is not None:
-                    self.perform_create(serializer, effect, project)
-                    return Response(status=status.HTTP_201_CREATED)
+                    instance = self.perform_create(serializer, effect, project)
+                    return Response(self.get_serializer(instance).data, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # no effect name
 
@@ -168,7 +168,7 @@ class TaskView(viewsets.ModelViewSet):
         return Response({'errors': 'no such project or index'}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer, effect, project):
-        serializer.save(effect=effect, project=project)
+        return serializer.save(effect=effect, project=project)
 
 
 class EffectView(viewsets.ModelViewSet):
@@ -233,10 +233,10 @@ class MediaView(viewsets.ModelViewSet):
             project = get_project(self.request.user, project_name=pk)
 
             if project is not None:
-                self.perform_create(serializer, project=project)
-                return Response(status=status.HTTP_201_CREATED)
+                instance = self.perform_create(serializer, project=project)
+                return Response(self.get_serializer(instance).data, status=status.HTTP_201_CREATED)
 
-            return Response({'errors': 'not such project'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'errors': 'no such project'}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
