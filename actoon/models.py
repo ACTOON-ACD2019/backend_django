@@ -106,7 +106,7 @@ def create_cuts(sender, instance=None, created=False, **kwargs):
         # close the loop
         loop.close()
 
-        bubble_index = 1
+        bubble_index = 0
 
         for cut_index in range(0, len(result['cut_info'])):
             current_cut = result['cut_info'][cut_index]
