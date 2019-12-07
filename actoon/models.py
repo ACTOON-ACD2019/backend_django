@@ -106,7 +106,7 @@ def create_cuts(sender, instance=None, created=False, **kwargs):
         # close the loop
         loop.close()
 
-        bubble_index = 1
+        bubble_index = 0
 
         for cut_index in range(0, len(result['cut_info'])):
             current_cut = result['cut_info'][cut_index]
@@ -139,10 +139,10 @@ def create_cuts(sender, instance=None, created=False, **kwargs):
                     # insert bubble
                     Cut(
                         media=instance,
-                        file=result['bubble'][bubble_index]['file'],
+                        file=result['bubble'][int(str_index)]['file'],
                         type='BU',
                         sequence=cut_index,
-                        sub_sequence=bubble_index - temp_bubble_index,
+                        sub_sequence=(bubble_index - temp_bubble_index),
                         pos_x=(pos_bub_x - pos_x),
                         pos_y=(pos_bub_y - pos_y)
                     ).save()
