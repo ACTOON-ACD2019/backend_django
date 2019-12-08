@@ -35,5 +35,3 @@ def get_project(user, project_name):
         return project_instance[0]
 
     return None
-
-

@@ -2,12 +2,13 @@ from django.shortcuts import get_list_or_404
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 
-from actoon import serializer as actoon_serializer, models as actoon_model
+import actoon.serializers.taskserializer
+from actoon import models as actoon_model
 from actoon.views.apihelper import get_project, get_effect
 
 
 class TaskView(viewsets.ModelViewSet):
-    serializer_class = actoon_serializer.TaskSerializer
+    serializer_class = actoon.serializers.taskserializer.TaskSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self, project_name=None, task_index=None):
@@ -31,7 +32,7 @@ class TaskView(viewsets.ModelViewSet):
 
         if queryset is not None:
             instance = get_list_or_404(queryset)  # 404 if there are no tasks in project
-            serializer = actoon_serializer.TaskListSerializer(instance, many=True)
+            serializer = actoon.serializers.taskserializer.TaskListSerializer(instance, many=True)
             # serializer.validated_data.pop('project')  # remove project_id from task results
             return Response(serializer.data)
 

@@ -2,12 +2,13 @@ from django.shortcuts import get_list_or_404
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 
-from actoon import serializer as actoon_serializer, models as actoon_model
+import actoon.serializers.mediaserializer
+from actoon import models as actoon_model
 from actoon.views.apihelper import get_project
 
 
 class MediaView(viewsets.ModelViewSet):
-    serializer_class = actoon_serializer.MediaSerializer
+    serializer_class = actoon.serializers.mediaserializer.MediaSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self, project_name=None, media_id=None):

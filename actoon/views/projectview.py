@@ -2,11 +2,12 @@ from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 
-from actoon import serializer as actoon_serializer, models as actoon_model
+import actoon.serializers.projectserializer
+from actoon import models as actoon_model
 
 
 class ProjectView(viewsets.ModelViewSet):
-    serializer_class = actoon_serializer.ProjectSerializer
+    serializer_class = actoon.serializers.projectserializer.ProjectSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self, name=None):

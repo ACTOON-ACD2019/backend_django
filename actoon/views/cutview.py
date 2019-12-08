@@ -5,7 +5,8 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.utils import json
 
-from actoon import serializer as actoon_serializer, models as actoon_model
+import actoon.serializers.cutserializer
+from actoon import models as actoon_model
 from actoon.apps.renamer import create_random_name
 from actoon.models import Cut
 from actoon.views.apihelper import get_project, get_media
@@ -13,7 +14,7 @@ from actoon_backend.settings import BASE_DIR
 
 
 class CutView(viewsets.ModelViewSet):
-    serializer_class = actoon_serializer.CutSerializer
+    serializer_class = actoon.serializers.cutserializer.CutSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self, media=None):

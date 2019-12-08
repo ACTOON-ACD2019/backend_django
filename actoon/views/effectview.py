@@ -2,12 +2,13 @@ from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 
-from actoon import models as actoon_model, serializer as actoon_serializer
+import actoon.serializers.effectserializer
+from actoon import models as actoon_model
 
 
 class EffectView(viewsets.ModelViewSet):
     queryset = actoon_model.Effect.objects.all()
-    serializer_class = actoon_serializer.EffectSerializer
+    serializer_class = actoon.serializers.effectserializer.EffectSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self, pk=None):
