@@ -6,6 +6,12 @@ from rest_framework import status, viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.utils import json
 
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+
+from actoon.models import Cut
+from actoon.apps.renamer import create_random_name
+from actoon.apps.config import BASE_DIR
 
 def get_media(project=None):
     queryset = actoon_model.Media.objects\
@@ -276,7 +282,7 @@ class CutView(viewsets.ModelViewSet):
             data = []
 
             for media_s in media:
-                cut_individual = actoon_model.Cut.objects.filter(media=media_s)
+                cut_individual = actoon_model.Cut.objects.filter(media=media_s).filter(linked=None)
                 instances = get_list_or_404(cut_individual)
 
                 # arrange with cut sequence
@@ -317,3 +323,46 @@ class CutView(viewsets.ModelViewSet):
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, pk=None, cpk=None):
+        project_instance = get_project(self.request.user, pk)
+        media_instance = get_media(project_instance)
+
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            for media in media_instance:
+                cuts = Cut.objects.filter(media=media).filter(file=cpk)
+
+                if cuts.exists():
+                    cut_original = get_object_or_404(cuts)
+
+                    uploaded_file = serializer.validated_data['file_upload']
+                    temp_folder = BASE_DIR + '/media/'
+
+                    random_name = create_random_name(temp_folder, '.' + uploaded_file.name.split('.')[-1])
+
+                    new_file = default_storage.save(random_name, ContentFile(uploaded_file.read()))
+
+                    instance = Cut(
+                        file=new_file,
+                        media=cut_original.media,
+                        type=cut_original.type,
+                        sequence=cut_original.sequence,
+                        sub_sequence=cut_original.sub_sequence,
+                        pos_x=cut_original.pos_x,
+                        pos_y=cut_original.pos_y
+                    )
+                    instance.save()
+
+                    cut_original.linked = instance
+                    cut_original.save()
+
+                    return Response(self.get_serializer(instance).data, status=status.HTTP_202_ACCEPTED)
+
+            return Response({'errors': 'no such cut'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def pre_save(self, obj):
+        obj.file = self.request.FILES.get('file')
