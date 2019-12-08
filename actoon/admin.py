@@ -1,8 +1,10 @@
 from django.contrib import admin
-from actoon.models import Effect, Media, Cut, Project
+
+from actoon.models import cutmodel, effectmodel, mediamodel, projectmodel, taskmodel
 
 # Register your models here.
-admin.site.register(Effect)
-admin.site.register(Media)
-admin.site.register(Cut)
-admin.site.register(Project)
+admin.site.register(cutmodel.Cut)
+admin.site.register(mediamodel.Media)
+admin.site.register(effectmodel.Effect)
+admin.site.register(projectmodel.Project)
+admin.site.register(taskmodel.Task)

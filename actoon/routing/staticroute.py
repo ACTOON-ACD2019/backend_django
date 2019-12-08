@@ -14,8 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from actoon.views import staticviews
+
+from actoon.views import staticview
 
 urlpatterns = [
-    url(r'^media/', staticviews.media, name='media')
+    url(r'^media/', staticview.media, name='media')
 ]

@@ -1,50 +1,13 @@
 import asyncio
-from django.dispatch import receiver
+
 from django.db import models
 from django.db.models.signals import post_save
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from rest_framework.authtoken.models import Token
+from django.dispatch import receiver
 
-
-# Project
 from actoon.apps.rpcclient import RpcClient
+from actoon.models.mediamodel import Media
 
 
-class Project(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)  # name should be unique value per each users
-    description = models.CharField(max_length=255)
-
-
-# managing available effects
-class Effect(models.Model):
-    name = models.CharField(max_length=50)
-    required_parameters = models.CharField(max_length=255)
-
-
-# managing media file
-class Media(models.Model):
-    TYPE_CARTOON = 'TO'
-    TYPE_AUDIO = 'AU'
-    TYPE_MOVIE = 'MO'
-    TYPE_UNDEFINED = 'UD'
-
-    TYPE_MEDIA = [
-        (TYPE_CARTOON, 'Cartoon'),
-        (TYPE_AUDIO, 'Audio'),
-        (TYPE_MOVIE, 'Movie'),
-        (TYPE_UNDEFINED, 'Undefined')
-    ]
-
-    media_type = models.CharField(max_length=2, choices=TYPE_MEDIA, default=TYPE_UNDEFINED)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    file = models.FileField(blank=False, null=False)
-    proceeded = models.BooleanField(default=False)
-    proceeded_image = models.CharField(max_length=255)
-
-
-# managing each cut
 class Cut(models.Model):
     TYPE_SCENE = 'SC'
     TYPE_BUBBLE = 'BU'
@@ -68,23 +31,6 @@ class Cut(models.Model):
     sequence = models.IntegerField()
     sub_sequence = models.IntegerField(null=True)
     linked = models.ForeignKey('self', on_delete=models.CASCADE, null=True)  # link to proceeded(user-uploaded) cut
-
-
-# History (Task)
-# merging Action and Task model to simplify model
-class Task(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    cut = models.ForeignKey(Cut, on_delete=models.CASCADE)
-    effect = models.ForeignKey(Effect, on_delete=models.CASCADE)
-    parameters = models.CharField(max_length=255)
-    image_properties = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_auth_token(sender, instance=None, created=False, **kwargs):
-    if created:
-        Token.objects.create(user=instance)
 
 
 @receiver(post_save, sender=Media)
