@@ -67,6 +67,7 @@ class Cut(models.Model):
     pos_y = models.IntegerField(null=True)
     sequence = models.IntegerField()
     sub_sequence = models.IntegerField(null=True)
+    linked = models.ForeignKey('self', on_delete=models.CASCADE, null=True)  # link to proceeded(user-uploaded) cut
 
 
 # History (Task)

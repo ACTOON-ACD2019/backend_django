@@ -66,6 +66,10 @@ cut_list = apiviews.CutView.as_view({
     'delete': 'destroy'
 })
 
+cut_view = apiviews.CutView.as_view({
+    'patch': 'update'
+})
+
 urlpatterns = format_suffix_patterns([
     path('auth/', obtain_auth_token, name='auth'),
     path('auth/register/', register_view, name='register'),
@@ -83,4 +87,5 @@ urlpatterns = format_suffix_patterns([
     path('media/<str:pk>/<int:mpk>/', media_view, name='media_view'),
 
     path('cut/<str:pk>/', cut_list, name='cut_list'),
+    path('cut/<str:pk>/<str:cpk>/', cut_view, name='cut_view')
 ])
