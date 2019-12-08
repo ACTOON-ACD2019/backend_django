@@ -34,40 +34,43 @@ class CutView(viewsets.ModelViewSet):
             data = []
 
             for media_s in media:
-                cut_individual = actoon.models.cutmodel.Cut.objects.filter(media=media_s).filter(linked=None)
-                instances = get_list_or_404(cut_individual)
+                if media_s.proceeded is True:
+                    cut_individual = actoon.models.cutmodel.Cut.objects.filter(media=media_s).filter(linked=None)
+                    instances = get_list_or_404(cut_individual)
 
-                # arrange with cut sequence
-                instances.sort(key=lambda x: x.sequence)
+                    # arrange with cut sequence
+                    instances.sort(key=lambda x: x.sequence)
 
-                bubbles = []
-                cuts = []
-                full_cuts = []
+                    bubbles = []
+                    cuts = []
+                    full_cuts = []
 
-                for instance in instances:
-                    if instance.type == 'SC':
-                        cuts.append(instance)
-                    elif instance.type == 'FC':
-                        full_cuts.append(instance)
-                    elif instance.type == 'BU':
-                        bubbles.append(instance)
+                    for instance in instances:
+                        if instance.type == 'SC':
+                            cuts.append(instance)
+                        elif instance.type == 'FC':
+                            full_cuts.append(instance)
+                        elif instance.type == 'BU':
+                            bubbles.append(instance)
 
-                # make a empty field
-                for index, cut in enumerate(cuts):
-                    bubbles_in_cut = []
+                    # make a empty field
+                    for index, cut in enumerate(cuts):
+                        bubbles_in_cut = []
 
-                    for bubble in bubbles:
-                        if bubble.sequence is index:
-                            bubbles_in_cut.append(
-                                self.get_serializer(bubble).data)
+                        for bubble in bubbles:
+                            if bubble.sequence is index:
+                                bubbles_in_cut.append(
+                                    self.get_serializer(bubble).data)
 
-                    _data = {
-                        'thumbnail': self.get_serializer(full_cuts[index]).data,
-                        'background': self.get_serializer(cut).data,
-                        'bubbles': bubbles_in_cut
-                    }
+                        _data = {
+                            'thumbnail': self.get_serializer(full_cuts[index]).data,
+                            'background': self.get_serializer(cut).data,
+                            'bubbles': bubbles_in_cut
+                        }
 
-                    data.append(_data)
+                        data.append(_data)
+                else:
+                    print(' [x] %s is not proceeded, skipping...' % media_s)
 
             if len(data) > 0:
                 return Response(json.dumps(data))
