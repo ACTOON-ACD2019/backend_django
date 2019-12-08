@@ -1,20 +1,20 @@
-from actoon import models as actoon_model
-from actoon import serializer as actoon_serializer
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import status, viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.utils import json
 
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
-
-from actoon.models import Cut
-from actoon.apps.renamer import create_random_name
+from actoon import models as actoon_model
+from actoon import serializer as actoon_serializer
 from actoon.apps.config import BASE_DIR
+from actoon.apps.renamer import create_random_name
+from actoon.models import Cut
+
 
 def get_media(project=None):
-    queryset = actoon_model.Media.objects\
+    queryset = actoon_model.Media.objects \
         .filter(project=project)
     instance = get_list_or_404(queryset)
 
@@ -25,7 +25,7 @@ def get_media(project=None):
 
 
 def get_effect(name):
-    queryset_effect = actoon_model.Effect.objects\
+    queryset_effect = actoon_model.Effect.objects \
         .filter(name=name)
     effect_instance = get_list_or_404(queryset_effect)
 
@@ -36,8 +36,8 @@ def get_effect(name):
 
 
 def get_project(user, project_name):
-    queryset_project = actoon_model.Project.objects\
-        .filter(user=user)\
+    queryset_project = actoon_model.Project.objects \
+        .filter(user=user) \
         .filter(name=project_name)
     project_instance = get_list_or_404(queryset_project)
 
@@ -57,7 +57,7 @@ class ProjectView(viewsets.ModelViewSet):
         if name is None:
             return actoon_model.Project.objects.filter(user=user)
         else:
-            return actoon_model.Project.objects\
+            return actoon_model.Project.objects \
                 .filter(user=user).filter(name=name)
 
     def list(self, request):

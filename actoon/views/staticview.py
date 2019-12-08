@@ -1,6 +1,5 @@
 from django.core.files.storage import default_storage
 from django.shortcuts import HttpResponse
-from django.contrib.auth.decorators import login_required
 
 
 def media(request):

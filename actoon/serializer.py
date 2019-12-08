@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
 from actoon.models import Project, Task, Media, Effect, Cut
 
 

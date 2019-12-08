@@ -14,9 +14,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from rest_framework.urlpatterns import format_suffix_patterns
-from actoon.views import apiviews
 from rest_framework.authtoken.views import obtain_auth_token
+from rest_framework.urlpatterns import format_suffix_patterns
+
+from actoon.views import apiviews
 
 project_list = apiviews.ProjectView.as_view({
     'get': 'list',
@@ -24,23 +25,23 @@ project_list = apiviews.ProjectView.as_view({
 })
 
 project_view = apiviews.ProjectView.as_view({
-    'get': 'retrieve',      # retrieve projects
-    'patch': 'update',      # update project description
-    'delete': 'destroy'     # delete project
+    'get': 'retrieve',  # retrieve projects
+    'patch': 'update',  # update project description
+    'delete': 'destroy'  # delete project
 })
 
 task_list = apiviews.TaskView.as_view({
-    'get': 'list',          # list of tasks
-    'put': 'create',        # create a new task with a specified action
+    'get': 'list',  # list of tasks
+    'put': 'create',  # create a new task with a specified action
 })
 
 task_view = apiviews.TaskView.as_view({
-    'delete': 'destroy'      # delete the task
+    'delete': 'destroy'  # delete the task
     # depends on history-based management, update the task won't be supported
 })
 
 effect_list = apiviews.EffectView.as_view({
-    'get': 'list'           # get available effects
+    'get': 'list'  # get available effects
 })
 
 effect_view = apiviews.EffectView.as_view({

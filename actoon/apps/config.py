@@ -1,7 +1,7 @@
 import os
+
 from django.apps import AppConfig
 
-from actoon.apps.rpcclient import RpcClient
 from actoon_backend.settings import BASE_DIR
 
 

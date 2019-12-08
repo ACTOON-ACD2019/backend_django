@@ -1,16 +1,16 @@
-import asyncio
 import base64
 import json
 import os
+import pathlib
+import shutil
 import uuid
 import zipfile
-import shutil
-import pathlib
 
 from aio_pika import connect, IncomingMessage, Message
 from django.core.files import File
-from actoon_backend.settings import MEDIA_ROOT, BASE_DIR
+
 from actoon.apps.renamer import create_random_name
+from actoon_backend.settings import MEDIA_ROOT, BASE_DIR
 
 
 def cleanup_folder(folder):
