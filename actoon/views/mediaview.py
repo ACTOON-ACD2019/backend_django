@@ -51,9 +51,6 @@ class MediaView(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, *args, **kwargs):
-        pass
-
     def pre_save(self, obj):
         obj.file = self.request.FILES.get('file')
 
