@@ -33,5 +33,5 @@ class TaskSerializer(serializers.ModelSerializer):
         read_only_fields = ['effect', 'project', 'created_at']
 
     def create(self, validated_data):
-        validated_data.pop('effect_name')  # remove the field which is not a member
+        self.validated_data.pop('effect_name')  # remove the field which is not a member
         return Task.objects.create(**validated_data)

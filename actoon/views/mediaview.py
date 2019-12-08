@@ -8,6 +8,7 @@ from actoon.views.apihelper import get_project
 
 
 class MediaView(viewsets.ModelViewSet):
+    model = actoon.models.mediamodel.Media
     serializer_class = actoon.serializers.mediaserializer.MediaSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -16,13 +17,13 @@ class MediaView(viewsets.ModelViewSet):
             project_instance = get_project(self.request.user, project_name)
 
             if media_id is not None:
-                queryset_media_object = actoon.models.mediamodel.Media.objects.filter(pk=media_id)
+                queryset_media_object = self.model.objects.filter(pk=media_id)
 
                 if len(queryset_media_object) > 0:
                     return queryset_media_object[0]
             else:
                 if project_instance is not None:
-                    return actoon.models.mediamodel.Media.objects.filter(project=project_instance)
+                    return self.model.objects.filter(project=project_instance)
 
         return None
 

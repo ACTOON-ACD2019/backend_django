@@ -14,14 +14,15 @@ from actoon_backend.settings import BASE_DIR
 
 
 class CutView(viewsets.ModelViewSet):
+    model = actoon.models.cutmodel.Cut
     serializer_class = actoon.serializers.cutserializer.CutSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self, media=None):
         if media is not None:
-            queryset = actoon.models.cutmodel.Cut.objects.filter(media=media)
+            queryset = self.model.objects.filter(media=media)
         else:
-            queryset = actoon.models.cutmodel.Cut.objects.all()
+            queryset = self.model.Cut.objects.all()
 
         return queryset
 

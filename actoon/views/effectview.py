@@ -7,15 +7,16 @@ import actoon.serializers.effectserializer
 
 
 class EffectView(viewsets.ModelViewSet):
-    queryset = actoon.models.effectmodel.Effect.objects.all()
+    model = actoon.models.effectmodel.Effect
+    queryset = model.objects.all()
     serializer_class = actoon.serializers.effectserializer.EffectSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self, pk=None):
         if pk is not None:
-            queryset = actoon.models.effectmodel.Effect.objects.all(pk=pk)
+            queryset = self.model.objects.all(pk=pk)
         else:
-            queryset = actoon.models.effectmodel.Effect.objects.all()
+            queryset = self.model.objects.all()
 
         return queryset
 

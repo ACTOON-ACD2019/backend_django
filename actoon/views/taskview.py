@@ -8,6 +8,7 @@ from actoon.views.apihelper import get_project, get_effect
 
 
 class TaskView(viewsets.ModelViewSet):
+    model = actoon.models.taskmodel.Task
     serializer_class = actoon.serializers.taskserializer.TaskSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -16,14 +17,14 @@ class TaskView(viewsets.ModelViewSet):
             project_instance = get_project(self.request.user, project_name)
 
             if task_index is not None:
-                queryset_task_object = actoon.models.taskmodel.Task.objects.filter(project=project_instance) \
+                queryset_task_object = self.model.objects.filter(project=project_instance) \
                     .order_by('created_at')
 
                 if len(queryset_task_object) > task_index:
                     return queryset_task_object[task_index - 1]
             else:
                 if project_instance is not None:
-                    return actoon.models.taskmodel.Task.objects.filter(project=project_instance).order_by('created_at')
+                    return self.model.objects.filter(project=project_instance).order_by('created_at')
 
         return None
 
