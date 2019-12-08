@@ -19,3 +19,6 @@ addons:
   apt:
     packages:
       - rabbitmq-server
+
+after-success:
+  - codecov
