@@ -23,7 +23,6 @@ import actoon.views.mediaview
 import actoon.views.projectview
 import actoon.views.registerview
 import actoon.views.taskview
-from actoon.views import apihelper
 
 project_list = actoon.views.projectview.ProjectView.as_view({
     'get': 'list',

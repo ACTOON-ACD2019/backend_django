@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from actoon.models import Project
+from actoon.models.projectmodel import Project
 
 
 class ProjectSerializer(serializers.ModelSerializer):

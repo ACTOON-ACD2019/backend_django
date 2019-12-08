@@ -2,8 +2,8 @@ from django.shortcuts import get_list_or_404
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 
+import actoon.models.mediamodel
 import actoon.serializers.mediaserializer
-from actoon import models as actoon_model
 from actoon.views.apihelper import get_project
 
 
@@ -16,13 +16,13 @@ class MediaView(viewsets.ModelViewSet):
             project_instance = get_project(self.request.user, project_name)
 
             if media_id is not None:
-                queryset_media_object = actoon_model.Media.objects.filter(pk=media_id)
+                queryset_media_object = actoon.models.mediamodel.Media.objects.filter(pk=media_id)
 
                 if len(queryset_media_object) > 0:
                     return queryset_media_object[0]
             else:
                 if project_instance is not None:
-                    return actoon_model.Media.objects.filter(project=project_instance)
+                    return actoon.models.mediamodel.Media.objects.filter(project=project_instance)
 
         return None
 

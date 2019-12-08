@@ -2,8 +2,8 @@ from django.shortcuts import get_list_or_404
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 
+import actoon.models.taskmodel
 import actoon.serializers.taskserializer
-from actoon import models as actoon_model
 from actoon.views.apihelper import get_project, get_effect
 
 
@@ -16,14 +16,14 @@ class TaskView(viewsets.ModelViewSet):
             project_instance = get_project(self.request.user, project_name)
 
             if task_index is not None:
-                queryset_task_object = actoon_model.Task.objects.filter(project=project_instance) \
+                queryset_task_object = actoon.models.taskmodel.Task.objects.filter(project=project_instance) \
                     .order_by('created_at')
 
                 if len(queryset_task_object) > task_index:
                     return queryset_task_object[task_index - 1]
             else:
                 if project_instance is not None:
-                    return actoon_model.Task.objects.filter(project=project_instance).order_by('created_at')
+                    return actoon.models.taskmodel.Task.objects.filter(project=project_instance).order_by('created_at')
 
         return None
 

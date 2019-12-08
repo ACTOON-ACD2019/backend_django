@@ -5,10 +5,10 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.utils import json
 
+import actoon.models.cutmodel
 import actoon.serializers.cutserializer
-from actoon import models as actoon_model
 from actoon.apps.renamer import create_random_name
-from actoon.models import Cut
+from actoon.models.cutmodel import Cut
 from actoon.views.apihelper import get_project, get_media
 from actoon_backend.settings import BASE_DIR
 
@@ -19,9 +19,9 @@ class CutView(viewsets.ModelViewSet):
 
     def get_queryset(self, media=None):
         if media is not None:
-            queryset = actoon_model.Cut.objects.filter(media=media)
+            queryset = actoon.models.cutmodel.Cut.objects.filter(media=media)
         else:
-            queryset = actoon_model.Cut.objects.all()
+            queryset = actoon.models.cutmodel.Cut.objects.all()
 
         return queryset
 
@@ -33,7 +33,7 @@ class CutView(viewsets.ModelViewSet):
             data = []
 
             for media_s in media:
-                cut_individual = actoon_model.Cut.objects.filter(media=media_s).filter(linked=None)
+                cut_individual = actoon.models.cutmodel.Cut.objects.filter(media=media_s).filter(linked=None)
                 instances = get_list_or_404(cut_individual)
 
                 # arrange with cut sequence

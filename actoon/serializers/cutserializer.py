@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from actoon.models import Cut
+from actoon.models.cutmodel import Cut
 
 
 class CutSerializer(serializers.ModelSerializer):

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from actoon.models import Task
+from actoon.models.taskmodel import Task
 
 
 class TaskListSerializer(serializers.ModelSerializer):

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from actoon.models import Effect
+from actoon.models.effectmodel import Effect
 
 
 class EffectSerializer(serializers.ModelSerializer):

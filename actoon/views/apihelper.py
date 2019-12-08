@@ -1,10 +1,12 @@
 from django.shortcuts import get_list_or_404
 
-from actoon import models as actoon_model
+import actoon.models.effectmodel
+import actoon.models.mediamodel
+import actoon.models.projectmodel
 
 
 def get_media(project=None):
-    queryset = actoon_model.Media.objects \
+    queryset = actoon.models.mediamodel.Media.objects \
         .filter(project=project)
     instance = get_list_or_404(queryset)
 
@@ -15,7 +17,7 @@ def get_media(project=None):
 
 
 def get_effect(name):
-    queryset_effect = actoon_model.Effect.objects \
+    queryset_effect = actoon.models.effectmodel.Effect.objects \
         .filter(name=name)
     effect_instance = get_list_or_404(queryset_effect)
 
@@ -26,7 +28,7 @@ def get_effect(name):
 
 
 def get_project(user, project_name):
-    queryset_project = actoon_model.Project.objects \
+    queryset_project = actoon.models.projectmodel.Project.objects \
         .filter(user=user) \
         .filter(name=project_name)
     project_instance = get_list_or_404(queryset_project)

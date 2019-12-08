@@ -2,8 +2,8 @@ from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 
+import actoon.models.projectmodel
 import actoon.serializers.projectserializer
-from actoon import models as actoon_model
 
 
 class ProjectView(viewsets.ModelViewSet):
@@ -14,9 +14,9 @@ class ProjectView(viewsets.ModelViewSet):
         user = self.request.user
 
         if name is None:
-            return actoon_model.Project.objects.filter(user=user)
+            return actoon.models.projectmodel.Project.objects.filter(user=user)
         else:
-            return actoon_model.Project.objects \
+            return actoon.models.projectmodel.Project.objects \
                 .filter(user=user).filter(name=name)
 
     def list(self, request):

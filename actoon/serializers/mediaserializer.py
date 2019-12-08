@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from actoon.models import Media
+from actoon.models.mediamodel import Media
 
 
 class MediaSerializer(serializers.ModelSerializer):
