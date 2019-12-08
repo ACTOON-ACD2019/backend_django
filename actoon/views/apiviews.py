@@ -6,8 +6,12 @@ from rest_framework import status, viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.utils import json
 
-from actoon.models import Cut
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
+from actoon.models import Cut
+from actoon.apps.renamer import create_random_name
+from actoon.apps.config import BASE_DIR
 
 def get_media(project=None):
     queryset = actoon_model.Media.objects\
@@ -278,7 +282,7 @@ class CutView(viewsets.ModelViewSet):
             data = []
 
             for media_s in media:
-                cut_individual = actoon_model.Cut.objects.filter(media=media_s)
+                cut_individual = actoon_model.Cut.objects.filter(media=media_s).filter(linked=None)
                 instances = get_list_or_404(cut_individual)
 
                 # arrange with cut sequence
@@ -333,8 +337,15 @@ class CutView(viewsets.ModelViewSet):
                 if cuts.exists():
                     cut_original = get_object_or_404(cuts)
 
+                    uploaded_file = serializer.validated_data['file_upload']
+                    temp_folder = BASE_DIR + '/media/'
+
+                    random_name = create_random_name(temp_folder, '.' + uploaded_file.name.split('.')[-1])
+
+                    new_file = default_storage.save(random_name, ContentFile(uploaded_file.read()))
+
                     instance = Cut(
-                        file=serializer.validated_data['file_upload'],
+                        file=new_file,
                         media=cut_original.media,
                         type=cut_original.type,
                         sequence=cut_original.sequence,
@@ -347,7 +358,7 @@ class CutView(viewsets.ModelViewSet):
                     cut_original.linked = instance
                     cut_original.save()
 
-                    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+                    return Response(self.get_serializer(instance).data, status=status.HTTP_202_ACCEPTED)
 
             return Response({'errors': 'no such cut'}, status=status.HTTP_400_BAD_REQUEST)
 
