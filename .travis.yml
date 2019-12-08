@@ -4,13 +4,13 @@ python:
   - "3.7.4"
 
 env:
-  - DJANGO_VERSION=2.2.5
+  - DJANGO_VERSION=2.2.8
 
 install:
   - pip install -r requirements.txt
 
 script:
-  - python ./manage.py test
+  - coverage run --source='.' manage.py test
 
 services:
   - rabbitmq
@@ -19,3 +19,6 @@ addons:
   apt:
     packages:
       - rabbitmq-server
+
+after-success:
+  - codecov
