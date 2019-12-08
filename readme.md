@@ -1,4 +1,4 @@
-# django-backend [![Build Status](https://travis-ci.com/ACTOON-ACD2019/backend_django.svg?branch=master)](https://travis-ci.com/ACTOON-ACD2019/backend_django.svg?branch=master) ![Code Quality](https://api.codacy.com/project/badge/Grade/142bd1ee8c7a4ea08a83696bb1c8d692?isInternal=true) [![codecov](https://codecov.io/gh/ACTOON-ACD2019/backend_django/branch/master/graph/badge.svg)](https://codecov.io/gh/ACTOON-ACD2019/backend_django)
+# django-backend [![Build Status](https://travis-ci.com/ACTOON-ACD2019/backend_django.svg?branch=master)](https://travis-ci.com/ACTOON-ACD2019/backend_django) [![Code Quality](https://api.codacy.com/project/badge/Grade/142bd1ee8c7a4ea08a83696bb1c8d692?isInternal=true)](https://app.codacy.com/manual/k3nuku/backend_django) [![codecov](https://codecov.io/gh/ACTOON-ACD2019/backend_django/branch/master/graph/badge.svg)](https://codecov.io/gh/ACTOON-ACD2019/backend_django)
 
 ACTOON backend implementation using Django REST Framework
 
@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-Make sure that you have installed Python >3.7 before installation.
+Make sure that you have installed [Python](https://python.org/) >=3.7 and [pip](https://pip.pypa.io/en/stable/installing/) before installation.
 
 -   If you are using [pyenv](https://github.com/pyenv/pyenv) virtualenv, run a commands below to make separated python environment.
 ``` bash
@@ -45,8 +45,8 @@ You can serve django with a reverse-proxy setup with nginx, apache, caddy and th
 -   [Django](https://www.djangoproject.com/) - The Web framework built with Python
 -   [Django REST Framework](https://www.django-rest-framework.org/) - REST API Framework for Django (Django Apps)
 -   [Travis CI](https://travisci.com/) - Code Integration
--   [Codacy](https://codacy.com) - Code Quality
-
+-   [Codacy](https://codacy.com) - Code Qualification
+-   [Codecov](https://codecov.io) - Code Coverage Measurement 
 ## Versioning
 
 We use GitHub's tag for versioning. For the versions available, see the [tags on this repository](https://github.com/ACTOON-ACD2019/backend_django/tags). 
