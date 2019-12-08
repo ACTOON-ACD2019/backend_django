@@ -1,4 +1,4 @@
-# django-backend [![Build Status](https://travis-ci.com/ACTOON-ACD2019/backend_django.svg?branch=master)](https://travis-ci.com/ACTOON-ACD2019/backend_django.svg?branch=master) ![Code Quality](https://api.codacy.com/project/badge/Grade/142bd1ee8c7a4ea08a83696bb1c8d692?isInternal=true)
+# django-backend [![Build Status](https://travis-ci.com/ACTOON-ACD2019/backend_django.svg?branch=master)](https://travis-ci.com/ACTOON-ACD2019/backend_django.svg?branch=master) ![Code Quality](https://api.codacy.com/project/badge/Grade/142bd1ee8c7a4ea08a83696bb1c8d692?isInternal=true) [![codecov](https://codecov.io/gh/ACTOON-ACD2019/backend_django/branch/master/graph/badge.svg)](https://codecov.io/gh/ACTOON-ACD2019/backend_django)
 
 ACTOON backend implementation using Django REST Framework
 
