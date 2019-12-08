@@ -17,57 +17,63 @@ from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from actoon.views import apiviews
+import actoon.views.cutview
+import actoon.views.effectview
+import actoon.views.mediaview
+import actoon.views.projectview
+import actoon.views.registerview
+import actoon.views.taskview
+from actoon.views import apihelper
 
-project_list = apiviews.ProjectView.as_view({
+project_list = actoon.views.projectview.ProjectView.as_view({
     'get': 'list',
     'put': 'create'
 })
 
-project_view = apiviews.ProjectView.as_view({
+project_view = actoon.views.projectview.ProjectView.as_view({
     'get': 'retrieve',  # retrieve projects
     'patch': 'update',  # update project description
     'delete': 'destroy'  # delete project
 })
 
-task_list = apiviews.TaskView.as_view({
+task_list = actoon.views.taskview.TaskView.as_view({
     'get': 'list',  # list of tasks
     'put': 'create',  # create a new task with a specified action
 })
 
-task_view = apiviews.TaskView.as_view({
+task_view = actoon.views.taskview.TaskView.as_view({
     'delete': 'destroy'  # delete the task
     # depends on history-based management, update the task won't be supported
 })
 
-effect_list = apiviews.EffectView.as_view({
+effect_list = actoon.views.effectview.EffectView.as_view({
     'get': 'list'  # get available effects
 })
 
-effect_view = apiviews.EffectView.as_view({
+effect_view = actoon.views.effectview.EffectView.as_view({
     'get': 'retrieve'
 })
 
-media_list = apiviews.MediaView.as_view({
+media_list = actoon.views.mediaview.MediaView.as_view({
     'get': 'list',
     'post': 'create'
 })
 
-media_view = apiviews.MediaView.as_view({
+media_view = actoon.views.mediaview.MediaView.as_view({
     'delete': 'destroy'
 })
 
-register_view = apiviews.RegisterView.as_view({
+register_view = actoon.views.registerview.RegisterView.as_view({
     'post': 'create',
     'patch': 'update'
 })
 
-cut_list = apiviews.CutView.as_view({
+cut_list = actoon.views.cutview.CutView.as_view({
     'get': 'list',
     'delete': 'destroy'
 })
 
-cut_view = apiviews.CutView.as_view({
+cut_view = actoon.views.cutview.CutView.as_view({
     'patch': 'update'
 })
 

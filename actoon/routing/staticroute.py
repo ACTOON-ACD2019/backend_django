@@ -15,8 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url
 
-from actoon.views import staticviews
+from actoon.views import staticview
 
 urlpatterns = [
-    url(r'^media/', staticviews.media, name='media')
+    url(r'^media/', staticview.media, name='media')
 ]
