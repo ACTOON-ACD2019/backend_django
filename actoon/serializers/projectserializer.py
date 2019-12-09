@@ -8,5 +8,9 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = [
             'name',
-            'description'
+            'description',
+            'resolution_width',
+            'resolution_height'
+            'created_at'
         ]
+        read_only_fields = ['created_at']
