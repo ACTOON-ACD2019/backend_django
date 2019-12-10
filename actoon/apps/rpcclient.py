@@ -31,7 +31,7 @@ def load_files(random_file, cut_type):
 
     if cut_type is not 'final':
         # search provided types
-        for root, dirs, files in os.walk(random_file + '.extracted/test/predictions/' + cut_type + '/'):
+        for root, dirs, files in os.walk(random_file + '.extracted/root/predictions/' + cut_type + '/'):
             for file in files:
                 file = File(open(os.path.join(root, file), 'rb'))
                 new_name = create_random_name(MEDIA_ROOT, pathlib.Path(file.name).suffix)
@@ -40,7 +40,7 @@ def load_files(random_file, cut_type):
 
                 context = {
                     'type': cut_type,
-                    'sequence': int(file.name.split('.')[-2].split('_')[-1]),
+                    'sequence': int(file.name.split('.')[-2].split('/')[-1]) if cut_type == 'bubble' else int(file.name.split('.')[-2].split('_')[-1]),
                     'file': new_name
                 }
 
@@ -48,7 +48,7 @@ def load_files(random_file, cut_type):
 
         return_list.sort(key=lambda x: x['sequence'])
     else:
-        file = File(open(random_file + '.extracted/test/predictions/final/1.jpg'))
+        file = File(open(random_file + '.extracted/root/predictions/final/1.jpg'))
         new_name = create_random_name(MEDIA_ROOT, pathlib.Path(file.name).suffix)
         new_path = MEDIA_ROOT + new_name
         os.rename(file.name, new_path)
