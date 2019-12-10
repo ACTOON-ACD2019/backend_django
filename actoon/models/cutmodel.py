@@ -70,7 +70,7 @@ def create_cuts(sender, instance=None, created=False, **kwargs):
             # insert full cut
             Cut(
                 media=instance,
-                file=result['rect_cut'][cut_index]['file'],
+                file=result['thumbnails'][cut_index]['file'],
                 type='FC',
                 sequence=cut_index
             ).save()

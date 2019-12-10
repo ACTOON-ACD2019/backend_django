@@ -137,7 +137,7 @@ class RpcClient:
             'cut_info': json.loads(response['header']),
             'cut': load_files(random_file, 'cut'),
             'bubble': load_files(random_file, 'bubble'),
-            'rect_cut': load_files(random_file, 'rect_cut'),
+            'thumbnails': load_files(random_file, 'thumbnails'),
             'final': load_files(random_file, 'final')[0]
         }
 
