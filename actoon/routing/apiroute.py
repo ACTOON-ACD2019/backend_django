@@ -23,6 +23,7 @@ import actoon.views.mediaview
 import actoon.views.projectview
 import actoon.views.registerview
 import actoon.views.taskview
+import actoon.views.encodeview
 
 project_list = actoon.views.projectview.ProjectView.as_view({
     'get': 'list',
@@ -76,6 +77,10 @@ cut_view = actoon.views.cutview.CutView.as_view({
     'patch': 'update'
 })
 
+encode_view = actoon.views.encodeview.EncodeView.as_view({
+    'get': 'retrieve'
+})
+
 urlpatterns = format_suffix_patterns([
     path('auth/', obtain_auth_token, name='auth'),
     path('auth/register/', register_view, name='register'),
@@ -93,5 +98,8 @@ urlpatterns = format_suffix_patterns([
     path('media/<str:pk>/<int:mpk>/', media_view, name='media_view'),
 
     path('cut/<str:pk>/', cut_list, name='cut_list'),
-    path('cut/<str:pk>/<str:cpk>/', cut_view, name='cut_view')
+    path('cut/<str:pk>/<str:cpk>/', cut_view, name='cut_view'),
+
+    path('preview/<str:pk>/<int:tpk>/', encode_view, name='encode_preview'),
+    path('encode/<str:pk>/', encode_view, name='full_encode'),
 ])
