@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 import actoon.models.taskmodel
 import actoon.serializers.taskserializer
-from actoon.views.apihelper import get_project, get_effect
+from actoon.views.apihelper import get_project, get_effect, get_cut
 
 
 class TaskView(viewsets.ModelViewSet):
@@ -42,17 +42,21 @@ class TaskView(viewsets.ModelViewSet):
 
     def create(self, request, pk=None):
         if request.data.__contains__('effect_name'):  # validate on server-side
-            serializer = self.get_serializer(data=request.data)
+            if request.data.__contains__('cut_name'):
+                serializer = self.get_serializer(data=request.data)
 
-            if serializer.is_valid() is True:
-                effect = get_effect(serializer.validated_data['effect_name'])  # sets the effect object
-                project = get_project(self.request.user, pk)  # get projects to insert task
+                if serializer.is_valid() is True:
+                    effect = get_effect(serializer.validated_data['effect_name'])  # sets the effect object
+                    cut = get_cut(serializer.validated_data['cut_name'])
+                    project = get_project(self.request.user, pk)  # get projects to insert task
 
-                if project is not None:
-                    instance = self.perform_create(serializer, effect, project)
-                    return Response(self.get_serializer(instance).data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # no effect name
+                    if project is not None:
+                        instance = self.perform_create(serializer, effect, project, cut)
+                        return Response(status=status.HTTP_201_CREATED)  # serializer problem
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # no effect name
+
+            return Response({'errors': 'no cut name'}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'errors': 'no effect name'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -65,5 +69,5 @@ class TaskView(viewsets.ModelViewSet):
 
         return Response({'errors': 'no such project or index'}, status=status.HTTP_400_BAD_REQUEST)
 
-    def perform_create(self, serializer, effect, project):
-        return serializer.save(effect=effect, project=project)
+    def perform_create(self, serializer, effect, project, cut):
+        return serializer.save(effect=effect, project=project, cut=cut)

@@ -3,6 +3,7 @@ from django.shortcuts import get_list_or_404
 import actoon.models.effectmodel
 import actoon.models.mediamodel
 import actoon.models.projectmodel
+import actoon.models.cutmodel
 
 
 def get_media(project=None):
@@ -35,5 +36,16 @@ def get_project(user, project_name):
 
     if len(project_instance) > 0:
         return project_instance[0]
+
+    return None
+
+
+def get_cut(cut_name):
+    queryset_cut = actoon.models.cutmodel.Cut.objects \
+        .filter(file=cut_name)
+    cut_instance = get_list_or_404(queryset_cut)
+
+    if len(cut_instance) > 0:
+        return cut_instance[0]
 
     return None
