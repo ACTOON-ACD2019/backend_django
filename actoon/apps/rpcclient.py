@@ -174,14 +174,14 @@ class RpcClient:
         result = response['result']
         file_payload = base64.b64decode(response['file'])
 
-        random_name = create_random_name(self.temp_folder, '.mp4')
-        random_file = self.temp_folder + random_name
+        new_name = create_random_name(MEDIA_ROOT, '.mp4')
+        new_path = MEDIA_ROOT + new_name
 
-        open(random_file, 'wb').write(file_payload)
+        open(new_path, 'wb').write(file_payload)
 
         return_val = {
             'result': result,
-            'file': random_name
+            'file': new_name
         }
 
         return return_val
