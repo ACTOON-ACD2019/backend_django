@@ -40,7 +40,8 @@ def load_files(random_file, cut_type):
 
                 context = {
                     'type': cut_type,
-                    'sequence': int(file.name.split('.')[-2].split('/')[-1]) if cut_type == 'bubble' else int(file.name.split('.')[-2].split('_')[-1]),
+                    'sequence': int(file.name.split('.')[-2].split('/')[-1]) if cut_type == 'bubble' else int(
+                        file.name.split('.')[-2].split('_')[-1]),
                     'file': new_name
                 }
 

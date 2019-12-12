@@ -19,11 +19,11 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 import actoon.views.cutview
 import actoon.views.effectview
+import actoon.views.encodeview
 import actoon.views.mediaview
 import actoon.views.projectview
 import actoon.views.registerview
 import actoon.views.taskview
-import actoon.views.encodeview
 
 project_list = actoon.views.projectview.ProjectView.as_view({
     'get': 'list',

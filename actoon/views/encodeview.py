@@ -1,14 +1,15 @@
 import asyncio
+
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 
 import actoon.models.mediamodel
 import actoon.models.taskmodel
-from actoon.serializers.taskserializer import TaskSerializer, TaskListSerializer
-from actoon.serializers.cutserializer import CutSerializer
 from actoon.apps.rpcclient import RpcClient
 from actoon.models.cutmodel import Cut
 from actoon.models.taskmodel import Task
+from actoon.serializers.cutserializer import CutSerializer
+from actoon.serializers.taskserializer import TaskSerializer, TaskListSerializer
 from actoon.views.apihelper import get_project
 
 
@@ -41,9 +42,9 @@ class EncodeView(viewsets.ModelViewSet):
                 target_cut = task.cut
                 target_sequence = target_cut.sequence
 
-                related_cuts = Cut.objects\
-                    .filter(media=target_cut.media)\
-                    .filter(sequence=target_sequence)\
+                related_cuts = Cut.objects \
+                    .filter(media=target_cut.media) \
+                    .filter(sequence=target_sequence) \
                     .exclude(type='FC')
 
                 # querying another tasks
@@ -77,7 +78,7 @@ class EncodeView(viewsets.ModelViewSet):
                     return Response({'preview': result['file']}, status=status.HTTP_200_OK)
                 else:
                     return Response({'error': 'encode failed with specified scene'},
-                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR);
+                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 return Response({'error': 'no such task'}, status=status.HTTP_400_BAD_REQUEST)
         else:  # full-encode and merge encoded files

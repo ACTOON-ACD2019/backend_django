@@ -1,9 +1,9 @@
 from django.shortcuts import get_list_or_404
 
+import actoon.models.cutmodel
 import actoon.models.effectmodel
 import actoon.models.mediamodel
 import actoon.models.projectmodel
-import actoon.models.cutmodel
 
 
 def get_media(project=None):
