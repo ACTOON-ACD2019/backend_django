@@ -40,7 +40,8 @@ def load_files(random_file, cut_type):
 
                 context = {
                     'type': cut_type,
-                    'sequence': int(file.name.split('.')[-2].split('/')[-1]) if cut_type == 'bubble' else int(file.name.split('.')[-2].split('_')[-1]),
+                    'sequence': int(file.name.split('.')[-2].split('/')[-1]) if cut_type == 'bubble' else int(
+                        file.name.split('.')[-2].split('_')[-1]),
                     'file': new_name
                 }
 
@@ -64,6 +65,7 @@ def load_files(random_file, cut_type):
 class RpcClient:
     rpc_connection = 'amqp://guest:guest@127.0.0.1/'
     rpc_queue_cut_slicing = 'rpc_cut_slicing_queue'
+    rpc_queue_encoding = 'rpc_encoding_queue'
     temp_folder = BASE_DIR + '/temp/'
 
     def __init__(self, loop):
@@ -111,6 +113,23 @@ class RpcClient:
 
         return await future
 
+    async def call_encoding(self, json_tasks):
+        future = self.loop.create_future()
+
+        self.futures[self.correlation_id] = future
+
+        await self.channel.default_exchange.publish(
+            Message(
+                base64.b64encode(json_tasks.encode('utf-8')),
+                content_type="task_data/json",
+                correlation_id=self.correlation_id,
+                reply_to=self.callback_queue.name,
+            ),
+            routing_key=self.rpc_queue_encoding,
+        )
+
+        return await future
+
     async def cut_slicing_request(self, media):
         print(" [x] Requesting cut slicing %s with event loop" % media.file)
 
@@ -145,10 +164,27 @@ class RpcClient:
 
         return return_val
 
-    @staticmethod
-    async def encode_request(task, media=None):
-        print(" [x] Requesting encoding")
-        # should be implemented
+    async def encode_request(self, tasks):
+        print(" [x] Requesting encode")
+
+        response = json.loads(str(await self.call_encoding(json.dumps(tasks)), 'utf-8'))
+
+        await self.close()
+
+        result = response['result']
+        file_payload = base64.b64decode(response['file'])
+
+        random_name = create_random_name(self.temp_folder, '.mp4')
+        random_file = self.temp_folder + random_name
+
+        open(random_file, 'wb').write(file_payload)
+
+        return_val = {
+            'result': result,
+            'file': random_name
+        }
+
+        return return_val
 
     @staticmethod
     async def text_recognize(task, media=None):
