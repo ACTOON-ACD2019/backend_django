@@ -31,6 +31,7 @@ class Cut(models.Model):
     sequence = models.IntegerField()
     sub_sequence = models.IntegerField(null=True)
     linked = models.ForeignKey('self', on_delete=models.CASCADE, null=True)  # link to proceeded(user-uploaded) cut
+    translate_info = models.CharField(max_length=255)
 
 
 @receiver(post_save, sender=Media)

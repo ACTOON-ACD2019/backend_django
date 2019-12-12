@@ -8,7 +8,7 @@ class CutSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cut
-        fields = ['file', 'type', 'sequence', 'sub_sequence', 'pos_x', 'pos_y', 'file_upload']
+        fields = ['file', 'type', 'sequence', 'sub_sequence', 'pos_x', 'pos_y', 'file_upload', 'translate_info']
         read_only_fields = ['file', 'type', 'sequence', 'sub_sequence', 'pos_x', 'pos_y']
 
     def create(self, validated_data):
