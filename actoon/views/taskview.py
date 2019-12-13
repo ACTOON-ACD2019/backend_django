@@ -18,7 +18,7 @@ class TaskView(viewsets.ModelViewSet):
 
             if task_index is not None:
                 queryset_task_object = self.model.objects.filter(project=project_instance) \
-                    .order_by('created_at')
+                    .order_by('-created_at')
 
                 if len(queryset_task_object) > task_index:
                     return queryset_task_object[task_index - 1]
